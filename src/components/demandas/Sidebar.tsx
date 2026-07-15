@@ -10,9 +10,7 @@ type State = ReturnType<typeof useDemandas>;
 
 export function Sidebar({ state }: { state: State }) {
   const { create, demandas, restore } = state;
-  const now = nowDataHora();
   const [form, setForm] = useState({
-    data: now.data, hora: now.hora,
     operadora: OPERADORAS[0], solicitante: "",
     tipo: TIPOS[0], beneficiario: "",
     medica_responsavel: "", data_eq: "",
