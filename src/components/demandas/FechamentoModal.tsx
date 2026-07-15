@@ -327,24 +327,26 @@ export function FechamentoModal({
     return buildSlideData(arr, operadora, mesNome, ano);
   }, [filtered, operadora, isConsolidado, mesNome, ano]);
 
-  async function captureNode(node: HTMLElement) {
-    return html2canvas(node, { scale: 2, backgroundColor: C.page, useCORS: true, width: 1672, height: 941, windowWidth: 1672 });
-  }
+  const captureOpts = {
+    width: 1672,
+    height: 941,
+    canvasWidth: 1672,
+    canvasHeight: 941,
+    pixelRatio: 2,
+    backgroundColor: C.page,
+    cacheBust: true,
+    style: { transform: "none" },
+  } as const;
 
   async function exportPNG() {
     if (!slideRef.current) return;
     const t = toast.loading("Gerando PNG...");
     try {
-      const canvas = await captureNode(slideRef.current);
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `fechamento_${operadora}_${mesKey}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+      const dataUrl = await toPng(slideRef.current, captureOpts);
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `fechamento_${operadora}_${mesKey}.png`;
+      a.click();
       toast.success("PNG exportado", { id: t });
     } catch (e) {
       console.error(e);
@@ -359,7 +361,7 @@ export function FechamentoModal({
 
       if (isConsolidado) {
         const wrap = document.createElement("div");
-        wrap.style.cssText = "position:fixed;left:-99999px;top:0;";
+        wrap.style.cssText = "position:fixed;left:-99999px;top:0;width:1672px;";
         document.body.appendChild(wrap);
 
         const { createRoot } = await import("react-dom/client");
@@ -367,14 +369,16 @@ export function FechamentoModal({
 
         async function renderAndCapture(el: React.ReactElement, bg: string) {
           const host = document.createElement("div");
+          host.style.cssText = "width:1672px;height:941px;";
           wrap.appendChild(host);
           const root = createRoot(host);
           root.render(el);
-          await new Promise((r) => setTimeout(r, 250));
-          const canvas = await html2canvas(host.firstChild as HTMLElement, { scale: 2, backgroundColor: bg, useCORS: true, width: 1672, height: 941, windowWidth: 1672 });
+          await new Promise((r) => setTimeout(r, 300));
+          const target = host.firstElementChild as HTMLElement;
+          const dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.92 });
           root.unmount();
           host.remove();
-          return canvas.toDataURL("image/jpeg", 0.92);
+          return dataUrl;
         }
 
         const coverImg = await renderAndCapture(React.createElement(CoverSlide, { mes: mesNome, ano }), C.cover);
@@ -390,8 +394,8 @@ export function FechamentoModal({
         pdf.save(`Fechamento_Consolidado_${mesNome}_${ano}.pdf`);
       } else {
         if (!slideRef.current) return;
-        const canvas = await captureNode(slideRef.current);
-        pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", 0, 0, 1672, 941);
+        const dataUrl = await toJpeg(slideRef.current, { ...captureOpts, quality: 0.92 });
+        pdf.addImage(dataUrl, "JPEG", 0, 0, 1672, 941);
         pdf.save(`fechamento_${operadora}_${mesKey}.pdf`);
       }
       toast.success("PDF exportado", { id: t });
