@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { Demanda } from "@/lib/demandas";
-import { MESES, mesDaData } from "@/lib/demandas";
+import { MESES, mesDaData, OPERADORAS } from "@/lib/demandas";
 import { X, Download, FileImage } from "lucide-react";
 import { toJpeg, toPng } from "html-to-image";
 import jsPDF from "jspdf";
