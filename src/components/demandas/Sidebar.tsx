@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { useDemandas } from "@/hooks/use-demandas";
 import { OPERADORAS, TIPOS, TIPOS_COM_MEDICA, MEDICAS, STATUS_LIST, nowDataHora } from "@/lib/demandas";
 import type { Demanda } from "@/lib/demandas";
-import * as XLSX from "xlsx";
+import { exportDemandasExcel } from "@/lib/excel-export";
 import { toast } from "sonner";
 import { Download, Save, Upload, History, PlusCircle } from "lucide-react";
 
