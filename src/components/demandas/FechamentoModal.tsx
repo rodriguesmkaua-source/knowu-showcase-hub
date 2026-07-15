@@ -251,7 +251,7 @@ function SlideCard({ data }: { data: SlideData }) {
           <div style={{ width: 566, flexShrink: 0, display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div style={{ fontSize: 21, fontWeight: 800, color: C.navy, marginBottom: 22, flexShrink: 0 }}>Distribuição por tipo de demanda</div>
             <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
-              <DonutSVG data={data} />
+              <DonutCanvas data={data} />
             </div>
           </div>
 
