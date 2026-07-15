@@ -5,6 +5,25 @@ import { X, Download, FileImage } from "lucide-react";
 import { toJpeg, toPng } from "html-to-image";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import unimedLogo from "@/assets/logos/unimed.png";
+import unimedEncostaLogo from "@/assets/logos/unimed-encosta-da-serra.png";
+
+/* ── Mapa de logos por operadora ───────────────────────────────────────── */
+function normalizeOp(s: string): string {
+  return (s || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase().replace(/\s+/g, " ").trim();
+}
+function getOperatorLogo(op: string): string | null {
+  const n = normalizeOp(op);
+  if (!n) return null;
+  // logos específicas
+  if (n === "UNIMED ENCOSTA DA SERRA" || n === "ENCOSTA DA SERRA") return unimedEncostaLogo;
+  // fallback: qualquer UNIMED usa a logo limpa
+  if (n.startsWith("UNIMED")) return unimedLogo;
+  return null;
+}
+
 
 /* ── Paleta fixa por categoria (idem fechamento-shared.js) ─────────────── */
 const CATEGORY_COLORS: Record<string, string> = {
