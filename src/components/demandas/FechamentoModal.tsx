@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import type { Demanda } from "@/lib/demandas";
 import { MESES, mesDaData } from "@/lib/demandas";
 import { X, Download, FileImage } from "lucide-react";
-import html2canvas from "html2canvas";
+import { toJpeg, toPng } from "html-to-image";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 
