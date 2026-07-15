@@ -77,7 +77,7 @@ export function DashboardTab({ state }: { state: State }) {
   ];
 
   const byOperadora = useMemo(() => OPERADORAS.map((o) => ({
-    name: o.replace("UNIMED ", "U."),
+    name: o.replace(/^UNIMED\s+/i, ""),
     total: filtered.filter((d) => d.operadora === o).length,
   })), [filtered]);
 
