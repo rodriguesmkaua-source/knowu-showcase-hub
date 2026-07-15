@@ -209,6 +209,23 @@ export function DashboardTab({ state }: { state: State }) {
     </div>
   );
 }
+function TwoLineTick(props: any) {
+  const { x, y, payload } = props;
+  const label: string = payload?.value ?? "";
+  // split em 2 linhas: primeira palavra em cima, resto embaixo
+  const parts = label.split(/\s+/);
+  const line1 = parts[0] ?? "";
+  const line2 = parts.slice(1).join(" ");
+  return (
+    <g transform={`translate(${x},${y + 12})`}>
+      <text textAnchor="middle" fill="#aaa" fontSize={11}>
+        <tspan x={0} dy={0}>{line1}</tspan>
+        {line2 && <tspan x={0} dy={13}>{line2}</tspan>}
+      </text>
+    </g>
+  );
+}
+
 
 function Stat({ label, value, tone }: { label: string; value: any; tone?: "success" | "warn" }) {
   const toneCls = tone === "success" ? "text-emerald-400" : tone === "warn" ? "text-yellow-400" : "text-foreground";
