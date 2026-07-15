@@ -228,3 +228,7 @@ mark.hl {
   padding: 0 2px;
   border-radius: 3px;
 }
+
+#lovable-badge { 
+  display: none !important; 
+}
