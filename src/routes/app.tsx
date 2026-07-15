@@ -91,7 +91,7 @@ function AppPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar state={state} />
+      <Sidebar state={state} mesFilter={mesFilter} />
 
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Topbar */}
