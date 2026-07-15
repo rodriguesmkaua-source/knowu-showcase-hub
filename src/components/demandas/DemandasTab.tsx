@@ -86,42 +86,49 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       </div>
 
       {/* Search + filters */}
-      <div className="glass rounded-xl p-4 space-y-3">
+      <div className="filter-panel group relative glass rounded-xl p-4 space-y-3 overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_32px_-8px_oklch(0.63_0.22_285/0.45)]">
+        {/* Animated gradient sweep on hover */}
+        <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+             style={{
+               background: "linear-gradient(120deg, transparent 30%, oklch(0.63 0.22 285 / 0.08) 50%, oklch(0.71 0.19 55 / 0.06) 65%, transparent 80%)",
+               backgroundSize: "200% 100%",
+               animation: "filter-sweep 3.5s linear infinite",
+             }} />
         <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-hover:text-primary" />
           <input
             value={q} onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar por beneficiário, operadora, tipo, solicitante, observação..."
-            className="w-full bg-input border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm outline-none focus:border-primary"
+            className="w-full bg-input/80 border border-border rounded-lg pl-9 pr-3 py-2.5 text-sm outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_3px_oklch(0.63_0.22_285/0.15)] hover:border-primary/30"
           />
         </div>
 
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="relative flex flex-wrap gap-2 items-center">
           <button
             onClick={() => setStatusFilter("todos")}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${statusFilter === "todos" ? "gradient-primary text-white shadow-[var(--glow-primary)]" : "bg-surface border border-border text-muted-foreground hover:border-primary/40"}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 hover:-translate-y-0.5 ${statusFilter === "todos" ? "gradient-primary text-white shadow-[var(--glow-primary)]" : "bg-surface border border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)]"}`}
           >Todos</button>
           {STATUS_LIST.map((s) => {
             const c = STATUS_COLORS[s];
             const active = statusFilter === s;
             return (
               <button key={s} onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition border ${active ? `${c.bg} ${c.text} ${c.border}` : "bg-surface border-border text-muted-foreground hover:border-primary/40"}`}>
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border hover:-translate-y-0.5 ${active ? `${c.bg} ${c.text} ${c.border}` : "bg-surface border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)]"}`}>
                 {s}
               </button>
             );
           })}
           <div className="flex-1" />
-          <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input border border-border rounded-lg px-2 py-1.5 text-xs">
+          <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer">
             <option value="todos">Todos os meses</option>
             {mesesDisponiveis.map((k) => {
               const [y, m] = k.split("-");
               return <option key={k} value={k}>{MESES[parseInt(m) - 1]} {y}</option>;
             })}
           </select>
-          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="bg-input border border-border rounded-lg px-2 py-1.5 text-xs" />
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none" />
           <span className="text-xs text-muted-foreground">→</span>
-          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="bg-input border border-border rounded-lg px-2 py-1.5 text-xs" />
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none" />
         </div>
       </div>
 
