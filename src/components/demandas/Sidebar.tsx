@@ -10,9 +10,7 @@ type State = ReturnType<typeof useDemandas>;
 
 export function Sidebar({ state }: { state: State }) {
   const { create, demandas, restore } = state;
-  const now = nowDataHora();
   const [form, setForm] = useState({
-    data: now.data, hora: now.hora,
     operadora: OPERADORAS[0], solicitante: "",
     tipo: TIPOS[0], beneficiario: "",
     medica_responsavel: "", data_eq: "",
@@ -37,16 +35,16 @@ export function Sidebar({ state }: { state: State }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.solicitante || !form.beneficiario) { toast.error("Preencha solicitante e beneficiário"); return; }
+    const n = nowDataHora();
     await create({
-      data: form.data, hora: form.hora,
+      data: n.data, hora: n.hora,
       operadora: form.operadora, solicitante: form.solicitante,
       tipo: form.tipo, beneficiario: form.beneficiario,
       medica_responsavel: showMedica ? form.medica_responsavel || null : null,
       data_eq: showMedica ? form.data_eq || null : null,
       status: form.status, observacao: form.observacao,
     });
-    const n = nowDataHora();
-    setForm((f) => ({ ...f, data: n.data, hora: n.hora, solicitante: "", beneficiario: "", observacao: "", medica_responsavel: "", data_eq: "" }));
+    setForm((f) => ({ ...f, solicitante: "", beneficiario: "", observacao: "", medica_responsavel: "", data_eq: "" }));
   }
 
   async function exportExcel() {
@@ -86,16 +84,7 @@ export function Sidebar({ state }: { state: State }) {
       </div>
 
       <form onSubmit={submit} className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <div className={labelCls}>Data</div>
-            <input className={inpCls + " font-mono"} value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} placeholder="DD/MM/AAAA" />
-          </div>
-          <div>
-            <div className={labelCls}>Hora</div>
-            <input className={inpCls + " font-mono"} value={form.hora} onChange={(e) => setForm({ ...form, hora: e.target.value })} placeholder="HH:MM" />
-          </div>
-        </div>
+
 
         <div>
           <div className={labelCls}>Operadora</div>

@@ -88,11 +88,15 @@ export function parseDataHora(data: string, hora: string): Date {
 }
 
 export function nowDataHora() {
-  const d = new Date();
-  const pad = (n: number) => String(n).padStart(2, "0");
+  const parts = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit", month: "2-digit", year: "numeric",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
   return {
-    data: `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`,
-    hora: `${pad(d.getHours())}:${pad(d.getMinutes())}`,
+    data: `${get("day")}/${get("month")}/${get("year")}`,
+    hora: `${get("hour")}:${get("minute")}`,
   };
 }
 
