@@ -79,12 +79,12 @@ export function DashboardTab({ state }: { state: State }) {
   const byOperadora = useMemo(() => OPERADORAS.map((o) => ({
     name: o.replace(/^UNIMED\s+/i, ""),
     total: filtered.filter((d) => d.operadora === o).length,
-  })), [filtered]);
+  })).sort((a, b) => b.total - a.total).slice(0, 3), [filtered]);
 
   const byTipo = useMemo(() => TIPOS.map((t) => ({
     name: t,
     total: filtered.filter((d) => d.tipo === t).length,
-  })), [filtered]);
+  })).sort((a, b) => b.total - a.total).slice(0, 3), [filtered]);
 
   const evolucao = useMemo(() => {
     // 12 meses até o mês atual, sempre presentes (mesmo com 0)
