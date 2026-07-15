@@ -174,6 +174,51 @@
   100% { background-position: -200% 0; }
 }
 
+/* Global filter hover treatment — selects and date/search inputs */
+select,
+input[type="date"],
+input[type="search"] {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+select:hover,
+input[type="date"]:hover,
+input[type="search"]:hover {
+  border-color: oklch(0.63 0.22 285 / 0.55);
+  box-shadow: 0 0 14px -2px oklch(0.63 0.22 285 / 0.4);
+}
+select:focus,
+input[type="date"]:focus,
+input[type="search"]:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px oklch(0.63 0.22 285 / 0.18);
+  outline: none;
+}
+
+/* Filter panel — animated gradient sweep on hover */
+.filter-panel {
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.filter-panel:hover {
+  border-color: oklch(0.63 0.22 285 / 0.4);
+  box-shadow: 0 0 32px -8px oklch(0.63 0.22 285 / 0.45);
+}
+.filter-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: linear-gradient(120deg, transparent 30%, oklch(0.63 0.22 285 / 0.08) 50%, oklch(0.71 0.19 55 / 0.06) 65%, transparent 80%);
+  background-size: 200% 100%;
+}
+.filter-panel:hover::before {
+  opacity: 1;
+  animation: filter-sweep 3.5s linear infinite;
+}
+
 .animate-fade-in { animation: fade-in 0.35s ease-out; }
 .animate-pulse-danger { animation: pulse-danger 1.5s ease-in-out infinite; }
 
