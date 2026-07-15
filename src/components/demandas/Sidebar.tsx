@@ -84,16 +84,7 @@ export function Sidebar({ state }: { state: State }) {
       </div>
 
       <form onSubmit={submit} className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <div className={labelCls}>Data</div>
-            <input className={inpCls + " font-mono"} value={form.data} onChange={(e) => setForm({ ...form, data: e.target.value })} placeholder="DD/MM/AAAA" />
-          </div>
-          <div>
-            <div className={labelCls}>Hora</div>
-            <input className={inpCls + " font-mono"} value={form.hora} onChange={(e) => setForm({ ...form, hora: e.target.value })} placeholder="HH:MM" />
-          </div>
-        </div>
+
 
         <div>
           <div className={labelCls}>Operadora</div>
