@@ -3,6 +3,7 @@
 import ExcelJS from "exceljs";
 import JSZip from "jszip";
 import type { Demanda } from "./demandas";
+import { TIPOS as CANON_TIPOS, OPERADORAS as CANON_OPERADORAS } from "./demandas";
 
 // excel.js — Geração do Excel formatado com ExcelJS
 
@@ -585,8 +586,8 @@ function buildPorOperadora(wb, items) {
 // ── Aba Análise Dinâmica ──────────────────────────────────────────────────
 // allItems = TODOS os registros (nunca filtrado), para análise correta
 function buildAnalise(wb, allItems) {
-  const ops   = [...new Set(allItems.map(i => i.op).filter(op => op && op !== '—'))].sort()
-  const tipos = [...new Set(allItems.map(i => i.tipo).filter(Boolean))].sort()
+  const ops   = [...new Set([...CANON_OPERADORAS, ...allItems.map(i => i.op).filter(op => op && op !== '—')])]
+  const tipos = [...CANON_TIPOS]
   const mesSet = new Set()
   allItems.forEach(i => {
     if (i.data && i.data.split('/').length === 3) {
