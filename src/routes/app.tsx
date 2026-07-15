@@ -24,6 +24,7 @@ function AppPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [tab, setTab] = useState<Tab>("demandas");
+  const [mesFilter, setMesFilter] = useState<string>("todos");
   const [resumoOpen, setResumoOpen] = useState(false);
   const [resumoShown, setResumoShown] = useState(false);
   const state = useDemandas();
