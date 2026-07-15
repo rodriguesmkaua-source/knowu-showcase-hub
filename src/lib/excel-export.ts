@@ -1273,14 +1273,20 @@ function buildCharts(items: LegacyItem[]) {
   };
 }
 
-export async function exportDemandasExcel(demandas: Demanda[]) {
+export async function exportDemandasExcel(demandas: Demanda[], mesFilter?: string) {
   const items = demandas.map(toLegacy);
   const charts = buildCharts(items);
   const buf = await generateExcel(items, charts, items);
   const blob = new Blob([buf], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
-  const filename = `demandas_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const today = new Date().toISOString().slice(0, 10);
+  let filename = `demandas_${today}.xlsx`;
+  if (mesFilter && mesFilter !== "todos") {
+    const [yy, mm] = mesFilter.split("-");
+    const abbr = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"][Number(mm) - 1] || "";
+    filename = `demandas_cs_${abbr}_${yy}-${today.slice(5)}.xlsx`;
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

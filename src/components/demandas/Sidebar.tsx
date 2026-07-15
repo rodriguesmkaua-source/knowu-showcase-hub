@@ -56,7 +56,7 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
             const [, m, y] = d.data.split("/");
             return `${y}-${m}` === mesFilter;
           });
-      const { buffer, filename } = await exportDemandasExcel(list);
+      const { buffer, filename } = await exportDemandasExcel(list, mesFilter);
       toast.success("Excel exportado");
       const uploading = toast.loading("Enviando para o Google Drive...");
       try {
