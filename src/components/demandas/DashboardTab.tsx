@@ -84,7 +84,7 @@ export function DashboardTab({ state }: { state: State }) {
   const byTipo = useMemo(() => TIPOS.map((t) => ({
     name: t,
     total: filtered.filter((d) => d.tipo === t).length,
-  })).filter((x) => x.total > 0), [filtered]);
+  })), [filtered]);
 
   const evolucao = useMemo(() => {
     const map = new Map<string, number>();
@@ -241,7 +241,6 @@ function OperadoraPanel({ demandas, operadora, onGerar, colors }: { demandas: De
 
   const tipos = TIPOS
     .map((t, i) => ({ name: t, total: demandas.filter((d) => d.tipo === t).length, fill: colorForTipo(t, colors[i % colors.length]) }))
-    .filter((x) => x.total > 0)
     .sort((a, b) => b.total - a.total);
 
   return (
@@ -262,7 +261,7 @@ function OperadoraPanel({ demandas, operadora, onGerar, colors }: { demandas: De
         </div>
       </div>
 
-      {tipos.length === 0 ? (
+      {total === 0 ? (
         <div className="text-center py-16 text-muted-foreground text-sm">Sem demandas para o filtro atual.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-6 items-center">
