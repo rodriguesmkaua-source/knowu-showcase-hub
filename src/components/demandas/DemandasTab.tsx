@@ -6,11 +6,10 @@ import { Search, Pencil, Trash2, X } from "lucide-react";
 
 type State = ReturnType<typeof useDemandas>;
 
-export function DemandasTab({ state }: { state: State }) {
+export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; mesFilter: string; setMesFilter: (v: string) => void }) {
   const { demandas, update, remove, bulkStatus } = state;
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "todos">("todos");
-  const [mesFilter, setMesFilter] = useState<string>("todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());

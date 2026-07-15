@@ -24,6 +24,7 @@ function AppPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
   const [tab, setTab] = useState<Tab>("demandas");
+  const [mesFilter, setMesFilter] = useState<string>("todos");
   const [resumoOpen, setResumoOpen] = useState(false);
   const [resumoShown, setResumoShown] = useState(false);
   const state = useDemandas();
@@ -90,7 +91,7 @@ function AppPage() {
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar state={state} />
+      <Sidebar state={state} mesFilter={mesFilter} />
 
       <main className="flex-1 min-w-0 flex flex-col">
         {/* Topbar */}
@@ -132,7 +133,7 @@ function AppPage() {
         </header>
 
         <div className="flex-1 p-6 overflow-y-auto">
-          {tab === "demandas" && <DemandasTab state={state} />}
+          {tab === "demandas" && <DemandasTab state={state} mesFilter={mesFilter} setMesFilter={setMesFilter} />}
           {tab === "dashboard" && <DashboardTab state={state} />}
           {tab === "kanban" && <KanbanTab state={state} />}
           {tab === "auditoria" && isAdmin && <AuditoriaTab />}
