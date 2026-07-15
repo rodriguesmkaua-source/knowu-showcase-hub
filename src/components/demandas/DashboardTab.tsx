@@ -79,7 +79,7 @@ export function DashboardTab({ state }: { state: State }) {
   const byOperadora = useMemo(() => OPERADORAS.map((o) => ({
     name: o.replace("UNIMED ", "U."),
     total: filtered.filter((d) => d.operadora === o).length,
-  })).filter((x) => x.total > 0), [filtered]);
+  })), [filtered]);
 
   const byTipo = useMemo(() => TIPOS.map((t) => ({
     name: t,
@@ -87,15 +87,18 @@ export function DashboardTab({ state }: { state: State }) {
   })), [filtered]);
 
   const evolucao = useMemo(() => {
-    const map = new Map<string, number>();
-    demandas.forEach((d) => {
-      const k = mesDaData(d.data).key;
-      map.set(k, (map.get(k) ?? 0) + 1);
-    });
-    return Array.from(map.entries()).sort().slice(-6).map(([k, v]) => {
-      const [y, m] = k.split("-");
-      return { name: `${MESES[parseInt(m) - 1].slice(0, 3)}/${y.slice(2)}`, total: v };
-    });
+    // Últimos 6 meses a partir de hoje, sempre presentes (mesmo com 0)
+    const now = new Date();
+    const out: { name: string; total: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const dt = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, "0");
+      const k = `${y}-${m}`;
+      const total = demandas.filter((d) => mesDaData(d.data).key === k).length;
+      out.push({ name: `${MESES[dt.getMonth()].slice(0, 3)}/${String(y).slice(2)}`, total });
+    }
+    return out;
   }, [demandas]);
 
   const COLORS = ["#7c6af7", "#F47B20", "#00c17c", "#eab308", "#a855f7", "#3b82f6", "#ef4444"];
