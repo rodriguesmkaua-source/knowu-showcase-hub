@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Demanda } from "@/lib/demandas";
 import { MESES, mesDaData } from "@/lib/demandas";
 import { X, Download, FileImage } from "lucide-react";
@@ -114,67 +114,60 @@ function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano
   return { op: operadora, opDisplay: shortOpName(operadora), mes, ano, tipos, total, maior, assinatura, maxCount };
 }
 
-/* ── Donut SVG (canvas 386×386, R=193, r=92) ───────────────────────────── */
-function DonutSVG({ data }: { data: SlideData }) {
-  const size = 386;
-  const cx = size / 2, cy = size / 2;
-  const R = 193, r = 92;
-  const { tipos, total } = data;
+/* ── Donut (canvas 386×386, R=193, r=92) — idêntico ao renderer original ─ */
+function DonutCanvas({ data }: { data: SlideData }) {
+  const ref = useRef<HTMLCanvasElement>(null);
 
-  if (!total) {
-    return (
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        <circle cx={cx} cy={cy} r={R} fill="#EDEAE3" />
-        <circle cx={cx} cy={cy} r={r} fill="#FFFFFF" />
-        <text x={cx} y={cy + 4} textAnchor="middle" fontSize={54} fontWeight={800} fill={C.navy} fontFamily={FONT}>0</text>
-        <text x={cx} y={cy + 32} textAnchor="middle" fontSize={20} fill="#8F8B82" fontFamily={FONT}>demandas</text>
-      </svg>
-    );
-  }
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const W = canvas.width, H = canvas.height, cx = W / 2, cy = H / 2;
+    const R = 193, r = 92;
+    const { tipos, total } = data;
+    ctx.clearRect(0, 0, W, H);
 
-  let angle = -Math.PI / 2;
-  const segs = tipos.filter((t) => t.count).map((t) => {
-    const frac = t.count / total;
-    const sweep = frac * Math.PI * 2;
-    const start = angle;
-    const end = angle + sweep;
-    angle = end;
+    if (!total) {
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fillStyle = "#EDEAE3"; ctx.fill();
+    } else {
+      let angle = -Math.PI / 2;
+      tipos.forEach((t) => {
+        if (!t.count) return;
+        const frac = t.count / total, sweep = frac * Math.PI * 2;
+        ctx.beginPath(); ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, R, angle, angle + sweep); ctx.closePath();
+        ctx.fillStyle = colorFor(t.tipo); ctx.fill();
+        ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 3; ctx.stroke();
 
-    // Pie slice from center (mesmo do canvas: moveTo(cx,cy) + arc)
-    const x1 = cx + R * Math.cos(start), y1 = cy + R * Math.sin(start);
-    const x2 = cx + R * Math.cos(end), y2 = cy + R * Math.sin(end);
-    const large = sweep > Math.PI ? 1 : 0;
-    const d = `M ${cx} ${cy} L ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} Z`;
+        const pct = Math.round(frac * 100);
+        if (pct >= 6) {
+          const mid = angle + sweep / 2, lr = (R + r) / 2;
+          ctx.save();
+          ctx.fillStyle = "#fff";
+          ctx.font = "700 23px Segoe UI, Arial";
+          ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = 3;
+          ctx.fillText(pct + "%", cx + Math.cos(mid) * lr, cy + Math.sin(mid) * lr);
+          ctx.restore();
+        }
+        angle += sweep;
+      });
+    }
 
-    const pct = Math.round(frac * 100);
-    const mid = start + sweep / 2;
-    const lr = (R + r) / 2;
-    const lx = cx + Math.cos(mid) * lr;
-    const ly = cy + Math.sin(mid) * lr;
-    return { d, color: colorFor(t.tipo), pct, lx, ly };
-  });
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = "#FFFFFF"; ctx.fill();
 
-  const totalStr = String(total);
-  const totalFontSize = totalStr.length >= 3 ? 46 : 54;
+    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = "#0B1F4A";
+    ctx.font = `800 ${String(total).length >= 3 ? 46 : 54}px Segoe UI, Arial`;
+    ctx.fillText(String(total), cx, cy + 4);
+    ctx.font = "500 20px Segoe UI, Arial"; ctx.fillStyle = "#8F8B82";
+    ctx.fillText("demandas", cx, cy + 32);
+  }, [data]);
 
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {segs.map((s, i) => (
-        <path key={i} d={s.d} fill={s.color} stroke="#FFFFFF" strokeWidth={3} />
-      ))}
-      {/* Miolo branco por cima */}
-      <circle cx={cx} cy={cy} r={r} fill="#FFFFFF" />
-      {segs.map((s, i) =>
-        s.pct >= 6 ? (
-          <text key={`t${i}`} x={s.lx} y={s.ly} textAnchor="middle" dominantBaseline="middle" fill="#fff" fontSize={23} fontWeight={700} fontFamily={FONT} style={{ paintOrder: "stroke", stroke: "rgba(0,0,0,.25)", strokeWidth: 0.5 }}>
-            {s.pct}%
-          </text>
-        ) : null
-      )}
-      <text x={cx} y={cy + 4} textAnchor="middle" fontSize={totalFontSize} fontWeight={800} fill={C.navy} fontFamily={FONT}>{totalStr}</text>
-      <text x={cx} y={cy + 32} textAnchor="middle" fontSize={20} fill="#8F8B82" fontFamily={FONT}>demandas</text>
-    </svg>
-  );
+  return <canvas ref={ref} width={386} height={386} style={{ width: 386, height: 386, display: "block" }} />;
 }
 
 /* ── Logo fallback (mesmo do CSS: pill translúcido com sigla) ──────────── */
@@ -258,7 +251,7 @@ function SlideCard({ data }: { data: SlideData }) {
           <div style={{ width: 566, flexShrink: 0, display: "flex", flexDirection: "column", minHeight: 0 }}>
             <div style={{ fontSize: 21, fontWeight: 800, color: C.navy, marginBottom: 22, flexShrink: 0 }}>Distribuição por tipo de demanda</div>
             <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
-              <DonutSVG data={data} />
+              <DonutCanvas data={data} />
             </div>
           </div>
 
