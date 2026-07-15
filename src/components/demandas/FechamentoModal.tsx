@@ -198,8 +198,16 @@ function SlideCard({ data }: { data: SlideData }) {
           {titleText}
         </div>
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", maxWidth: 420 }}>
-          <LogoFallback label={opDisplay} />
+          {(() => {
+            const logo = getOperatorLogo(data.op);
+            return logo ? (
+              <img src={logo} alt={opDisplay} crossOrigin="anonymous" style={{ maxHeight: 90, maxWidth: 400, objectFit: "contain", display: "block" }} />
+            ) : (
+              <LogoFallback label={opDisplay} />
+            );
+          })()}
         </div>
+
       </div>
 
       {/* Card */}
