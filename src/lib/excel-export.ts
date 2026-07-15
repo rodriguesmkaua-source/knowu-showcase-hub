@@ -1075,7 +1075,7 @@ async function injectChart(buffer, { firstDataRow, lastDataRow }) {
   zip.file('[Content_Types].xml', ct)
 
   try {
-    return await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 4 } })
+    return await zip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE', compressionOptions: { level: 4 } })
   } catch (e) {
     console.error('injectChart: generateAsync falhou:', e.message)
     return buffer
