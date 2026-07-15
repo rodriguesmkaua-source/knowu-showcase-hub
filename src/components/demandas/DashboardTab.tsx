@@ -171,10 +171,10 @@ export function DashboardTab({ state }: { state: State }) {
             <div className="text-sm font-semibold mb-3">Por operadora</div>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={byOperadora} margin={{ top: 10, right: 12, left: 0, bottom: 8 }}>
-                <XAxis dataKey="name" tick={<TwoLineTick />} interval={0} height={54} />
+                <XAxis dataKey="name" tick={<TwoLineTick />} interval={0} height={70} />
                 <YAxis tick={{ fill: "#aaa", fontSize: 11 }} allowDecimals={false} width={30} />
                 <Tooltip contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8 }} cursor={{ fill: "rgba(124,106,247,0.08)" }} />
-                <Bar dataKey="total" fill="#7c6af7" radius={[6, 6, 0, 0]} maxBarSize={44} />
+                <Bar dataKey="total" fill="#7c6af7" radius={[6, 6, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -212,19 +212,29 @@ export function DashboardTab({ state }: { state: State }) {
 function TwoLineTick(props: any) {
   const { x, y, payload } = props;
   const label: string = payload?.value ?? "";
-  // split em 2 linhas: primeira palavra em cima, resto embaixo
-  const parts = label.split(/\s+/);
-  const line1 = parts[0] ?? "";
-  const line2 = parts.slice(1).join(" ");
+  const parts = label.split(/\s+/).filter(Boolean);
+  // Distribui palavras em até 3 linhas para caber sob a barra sem sobrepor
+  const lines: string[] = [];
+  if (parts.length <= 1) {
+    lines.push(parts[0] ?? "");
+  } else if (parts.length === 2) {
+    lines.push(parts[0], parts[1]);
+  } else {
+    const mid = Math.ceil(parts.length / 2);
+    lines.push(parts.slice(0, mid).join(" "));
+    lines.push(parts.slice(mid).join(" "));
+  }
   return (
-    <g transform={`translate(${x},${y + 12})`}>
-      <text textAnchor="middle" fill="#aaa" fontSize={11}>
-        <tspan x={0} dy={0}>{line1}</tspan>
-        {line2 && <tspan x={0} dy={13}>{line2}</tspan>}
+    <g transform={`translate(${x},${y + 10})`}>
+      <text textAnchor="middle" fill="#cfd0d6" fontSize={10}>
+        {lines.map((ln, i) => (
+          <tspan key={i} x={0} dy={i === 0 ? 0 : 12}>{ln}</tspan>
+        ))}
       </text>
     </g>
   );
 }
+
 
 
 function Stat({ label, value, tone }: { label: string; value: any; tone?: "success" | "warn" }) {
