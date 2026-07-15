@@ -3,6 +3,7 @@
 import ExcelJS from "exceljs";
 import JSZip from "jszip";
 import type { Demanda } from "./demandas";
+import { TIPOS as CANON_TIPOS, OPERADORAS as CANON_OPERADORAS } from "./demandas";
 
 // excel.js — Geração do Excel formatado com ExcelJS
 
