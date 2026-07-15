@@ -14,6 +14,7 @@ import unimedMissoesLogo from "@/assets/logos/unimed-missoes.png";
 import unimedNordestePaulistaLogo from "@/assets/logos/unimed-nordeste-paulista.png";
 import unimedNoroesteParanaLogo from "@/assets/logos/unimed-noroeste-do-parana.png";
 import unimedSantaMariaLogo from "@/assets/logos/unimed-santa-maria.png";
+import unimedSaLogo from "@/assets/logos/unimed-sa.png";
 import circuloSaudeLogo from "@/assets/logos/circulo-saude.png";
 
 /* ── Mapa de logos por operadora (chave = nome normalizado) ────────────── */
