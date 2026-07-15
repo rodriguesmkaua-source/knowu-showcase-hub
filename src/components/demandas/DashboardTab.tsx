@@ -171,10 +171,10 @@ export function DashboardTab({ state }: { state: State }) {
             <div className="text-sm font-semibold mb-3">Por operadora</div>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={byOperadora} margin={{ top: 10, right: 12, left: 0, bottom: 8 }}>
-                <XAxis dataKey="name" tick={<TwoLineTick />} interval={0} height={54} />
+                <XAxis dataKey="name" tick={<TwoLineTick />} interval={0} height={70} />
                 <YAxis tick={{ fill: "#aaa", fontSize: 11 }} allowDecimals={false} width={30} />
                 <Tooltip contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8 }} cursor={{ fill: "rgba(124,106,247,0.08)" }} />
-                <Bar dataKey="total" fill="#7c6af7" radius={[6, 6, 0, 0]} maxBarSize={44} />
+                <Bar dataKey="total" fill="#7c6af7" radius={[6, 6, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ResponsiveContainer>
           </div>
