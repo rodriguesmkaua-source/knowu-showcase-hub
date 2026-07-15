@@ -49,18 +49,14 @@ export function Sidebar({ state }: { state: State }) {
     setForm((f) => ({ ...f, data: n.data, hora: n.hora, solicitante: "", beneficiario: "", observacao: "", medica_responsavel: "", data_eq: "" }));
   }
 
-  function exportExcel() {
-    const rows = demandas.map((d) => ({
-      Data: d.data, Hora: d.hora, Operadora: d.operadora, Solicitante: d.solicitante,
-      Tipo: d.tipo, Beneficiário: d.beneficiario, Médica: d.medica_responsavel ?? "",
-      "Data EQ": d.data_eq ?? "", Status: d.status, Observação: d.observacao,
-      "Resolvido em": d.resolvido_em ?? "",
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Demandas");
-    XLSX.writeFile(wb, `demandas_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    toast.success("Excel exportado");
+  async function exportExcel() {
+    try {
+      await exportDemandasExcel(demandas);
+      toast.success("Excel exportado");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro ao exportar Excel");
+    }
   }
   function backupJSON() {
     const blob = new Blob([JSON.stringify(demandas, null, 2)], { type: "application/json" });
