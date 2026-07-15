@@ -261,7 +261,7 @@ function OperadoraPanel({ demandas, operadora, onGerar, colors }: { demandas: De
         </div>
       </div>
 
-      {tipos.length === 0 ? (
+      {total === 0 ? (
         <div className="text-center py-16 text-muted-foreground text-sm">Sem demandas para o filtro atual.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-6 items-center">
