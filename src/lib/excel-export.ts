@@ -1118,9 +1118,165 @@ function toLegacy(d: Demanda): LegacyItem {
   };
 }
 
+// ── Renderiza os 4 gráficos como PNG base64 (canvas puro) ────────────────
+const STATUS_HEX: Record<string, string> = {
+  "Aberto": "#ef4444",
+  "Em andamento": "#eab308",
+  "Resolvido": "#10b981",
+  "Escalado": "#F47B20",
+  "Sem resposta": "#a855f7",
+};
+const PALETTE = ["#F47B20", "#22c55e", "#3b82f6", "#eab308", "#a855f7", "#ef4444", "#10b981", "#f97316", "#06b6d4", "#ec4899", "#8b5cf6", "#84cc16"];
+
+function pngFromCanvas(c: HTMLCanvasElement): string {
+  return c.toDataURL("image/png").split(",")[1];
+}
+
+function drawTitle(ctx: CanvasRenderingContext2D, w: number, title: string) {
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 20px Inter, Arial, sans-serif";
+  ctx.textAlign = "left";
+  ctx.fillText(title, 30, 34);
+}
+
+function drawVerticalBars(title: string, labels: string[], values: number[]): string {
+  const W = 1200, H = 560;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
+  drawTitle(ctx, W, title);
+  const pad = { l: 60, r: 30, t: 70, b: 70 };
+  const chartW = W - pad.l - pad.r, chartH = H - pad.t - pad.b;
+  const max = Math.max(1, ...values);
+  // eixo y
+  ctx.strokeStyle = "#e5e7eb"; ctx.lineWidth = 1;
+  ctx.font = "11px Inter, Arial"; ctx.fillStyle = "#64748b"; ctx.textAlign = "right";
+  const steps = 5;
+  for (let i = 0; i <= steps; i++) {
+    const y = pad.t + (chartH * i) / steps;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(W - pad.r, y); ctx.stroke();
+    const v = Math.round(max * (1 - i / steps));
+    ctx.fillText(String(v), pad.l - 6, y + 4);
+  }
+  const bw = chartW / labels.length * 0.65;
+  const gap = chartW / labels.length;
+  labels.forEach((lbl, i) => {
+    const v = values[i] || 0;
+    const h = (v / max) * chartH;
+    const x = pad.l + gap * i + (gap - bw) / 2;
+    const y = pad.t + chartH - h;
+    ctx.fillStyle = PALETTE[i % PALETTE.length];
+    ctx.fillRect(x, y, bw, h);
+    ctx.fillStyle = "#0f172a"; ctx.font = "bold 12px Inter, Arial"; ctx.textAlign = "center";
+    if (v > 0) ctx.fillText(String(v), x + bw / 2, y - 6);
+    ctx.fillStyle = "#334155"; ctx.font = "11px Inter, Arial";
+    const txt = lbl.length > 14 ? lbl.slice(0, 13) + "…" : lbl;
+    ctx.fillText(txt, x + bw / 2, pad.t + chartH + 18);
+  });
+  return pngFromCanvas(c);
+}
+
+function drawHorizontalBars(title: string, labels: string[], values: number[], colors?: string[]): string {
+  const rows = labels.length;
+  const rowH = 34;
+  const H = Math.max(260, 100 + rows * rowH);
+  const W = 1200;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
+  drawTitle(ctx, W, title);
+  const pad = { l: 260, r: 60, t: 70, b: 20 };
+  const chartW = W - pad.l - pad.r;
+  const max = Math.max(1, ...values);
+  labels.forEach((lbl, i) => {
+    const v = values[i] || 0;
+    const y = pad.t + i * rowH;
+    ctx.fillStyle = "#334155"; ctx.font = "12px Inter, Arial"; ctx.textAlign = "right";
+    const txt = lbl.length > 32 ? lbl.slice(0, 31) + "…" : lbl;
+    ctx.fillText(txt, pad.l - 10, y + rowH / 2 + 4);
+    const bw = (v / max) * chartW;
+    ctx.fillStyle = (colors && colors[i]) || PALETTE[i % PALETTE.length];
+    ctx.fillRect(pad.l, y + 6, bw, rowH - 12);
+    ctx.fillStyle = "#0f172a"; ctx.font = "bold 12px Inter, Arial"; ctx.textAlign = "left";
+    ctx.fillText(String(v), pad.l + bw + 6, y + rowH / 2 + 4);
+  });
+  return pngFromCanvas(c);
+}
+
+function drawDonut(title: string, labels: string[], values: number[], colors: string[]): string {
+  const W = 1200, H = 560;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, W, H);
+  drawTitle(ctx, W, title);
+  const cx = 320, cy = 300, R = 200, r = 110;
+  const total = values.reduce((a, b) => a + b, 0) || 1;
+  let ang = -Math.PI / 2;
+  values.forEach((v, i) => {
+    if (!v) return;
+    const a2 = ang + (v / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(ang) * r, cy + Math.sin(ang) * r);
+    ctx.arc(cx, cy, R, ang, a2);
+    ctx.arc(cx, cy, r, a2, ang, true);
+    ctx.closePath();
+    ctx.fillStyle = colors[i] || PALETTE[i % PALETTE.length];
+    ctx.fill();
+    ang = a2;
+  });
+  ctx.fillStyle = "#0f172a"; ctx.font = "bold 36px Inter, Arial"; ctx.textAlign = "center";
+  ctx.fillText(String(total), cx, cy + 6);
+  ctx.fillStyle = "#64748b"; ctx.font = "13px Inter, Arial";
+  ctx.fillText("Total", cx, cy + 30);
+  // legenda
+  const lx = 640;
+  labels.forEach((lbl, i) => {
+    const v = values[i] || 0;
+    const y = 110 + i * 44;
+    ctx.fillStyle = colors[i] || PALETTE[i % PALETTE.length];
+    ctx.fillRect(lx, y, 20, 20);
+    ctx.fillStyle = "#0f172a"; ctx.font = "bold 14px Inter, Arial"; ctx.textAlign = "left";
+    ctx.fillText(lbl, lx + 32, y + 15);
+    const pct = ((v / total) * 100).toFixed(1) + "%";
+    ctx.fillStyle = "#64748b"; ctx.font = "12px Inter, Arial";
+    ctx.fillText(`${v}  ·  ${pct}`, lx + 32, y + 32);
+  });
+  return pngFromCanvas(c);
+}
+
+function buildCharts(items: LegacyItem[]) {
+  // mensal
+  const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+  const monthCounts = new Array(12).fill(0);
+  items.forEach((it) => {
+    const m = parseInt((it.data || "").split("/")[1], 10);
+    if (m >= 1 && m <= 12) monthCounts[m - 1]++;
+  });
+  // status
+  const statusOrder = ["Aberto","Em andamento","Resolvido","Escalado","Sem resposta"];
+  const statusCounts = statusOrder.map((s) => items.filter((i) => i.status === s).length);
+  const statusColors = statusOrder.map((s) => STATUS_HEX[s]);
+  // tipos
+  const tipoMap = new Map<string, number>();
+  items.forEach((it) => { if (it.tipo) tipoMap.set(it.tipo, (tipoMap.get(it.tipo) || 0) + 1); });
+  const tipoEntries = [...tipoMap.entries()].sort((a, b) => b[1] - a[1]);
+  // operadoras
+  const opMap = new Map<string, number>();
+  items.forEach((it) => { if (it.op) opMap.set(it.op, (opMap.get(it.op) || 0) + 1); });
+  const opEntries = [...opMap.entries()].sort((a, b) => b[1] - a[1]);
+
+  return {
+    mensal: drawVerticalBars("Demandas por Mês", meses, monthCounts),
+    status: drawDonut("Distribuição por Status", statusOrder, statusCounts, statusColors),
+    tipos: drawHorizontalBars("Demandas por Tipo", tipoEntries.map((e) => e[0]), tipoEntries.map((e) => e[1])),
+    operadoras: drawHorizontalBars("Demandas por Operadora", opEntries.map((e) => e[0]), opEntries.map((e) => e[1])),
+  };
+}
+
 export async function exportDemandasExcel(demandas: Demanda[]) {
   const items = demandas.map(toLegacy);
-  const buf = await generateExcel(items, null, items);
+  const charts = buildCharts(items);
+  const buf = await generateExcel(items, charts, items);
   const blob = new Blob([buf], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
