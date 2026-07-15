@@ -169,6 +169,10 @@
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+@keyframes filter-sweep {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 
 .animate-fade-in { animation: fade-in 0.35s ease-out; }
 .animate-pulse-danger { animation: pulse-danger 1.5s ease-in-out infinite; }
