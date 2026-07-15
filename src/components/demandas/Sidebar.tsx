@@ -35,16 +35,16 @@ export function Sidebar({ state }: { state: State }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.solicitante || !form.beneficiario) { toast.error("Preencha solicitante e beneficiário"); return; }
+    const n = nowDataHora();
     await create({
-      data: form.data, hora: form.hora,
+      data: n.data, hora: n.hora,
       operadora: form.operadora, solicitante: form.solicitante,
       tipo: form.tipo, beneficiario: form.beneficiario,
       medica_responsavel: showMedica ? form.medica_responsavel || null : null,
       data_eq: showMedica ? form.data_eq || null : null,
       status: form.status, observacao: form.observacao,
     });
-    const n = nowDataHora();
-    setForm((f) => ({ ...f, data: n.data, hora: n.hora, solicitante: "", beneficiario: "", observacao: "", medica_responsavel: "", data_eq: "" }));
+    setForm((f) => ({ ...f, solicitante: "", beneficiario: "", observacao: "", medica_responsavel: "", data_eq: "" }));
   }
 
   async function exportExcel() {
