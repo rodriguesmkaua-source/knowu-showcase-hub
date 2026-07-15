@@ -50,8 +50,20 @@ export function Sidebar({ state }: { state: State }) {
 
   async function exportExcel() {
     try {
-      await exportDemandasExcel(demandas);
+      const { buffer, filename } = await exportDemandasExcel(demandas);
       toast.success("Excel exportado");
+      const uploading = toast.loading("Enviando para o Google Drive...");
+      try {
+        const bytes = new Uint8Array(buffer);
+        let bin = "";
+        for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        const base64 = btoa(bin);
+        await uploadExcelToDrive({ data: { filename, base64 } });
+        toast.success("Salvo no Google Drive", { id: uploading });
+      } catch (err) {
+        console.error(err);
+        toast.error("Falha ao enviar para o Drive", { id: uploading });
+      }
     } catch (e) {
       console.error(e);
       toast.error("Erro ao exportar Excel");
