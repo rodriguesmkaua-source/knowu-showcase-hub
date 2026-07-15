@@ -241,7 +241,6 @@ function OperadoraPanel({ demandas, operadora, onGerar, colors }: { demandas: De
 
   const tipos = TIPOS
     .map((t, i) => ({ name: t, total: demandas.filter((d) => d.tipo === t).length, fill: colorForTipo(t, colors[i % colors.length]) }))
-    .filter((x) => x.total > 0)
     .sort((a, b) => b.total - a.total);
 
   return (
