@@ -5,6 +5,25 @@ import { X, Download, FileImage } from "lucide-react";
 import { toJpeg, toPng } from "html-to-image";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
+import unimedLogo from "@/assets/logos/unimed.png";
+import unimedEncostaLogo from "@/assets/logos/unimed-encosta-da-serra.png";
+
+/* ── Mapa de logos por operadora ───────────────────────────────────────── */
+function normalizeOp(s: string): string {
+  return (s || "")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase().replace(/\s+/g, " ").trim();
+}
+function getOperatorLogo(op: string): string | null {
+  const n = normalizeOp(op);
+  if (!n) return null;
+  // logos específicas
+  if (n === "UNIMED ENCOSTA DA SERRA" || n === "ENCOSTA DA SERRA") return unimedEncostaLogo;
+  // fallback: qualquer UNIMED usa a logo limpa
+  if (n.startsWith("UNIMED")) return unimedLogo;
+  return null;
+}
+
 
 /* ── Paleta fixa por categoria (idem fechamento-shared.js) ─────────────── */
 const CATEGORY_COLORS: Record<string, string> = {
@@ -179,8 +198,16 @@ function SlideCard({ data }: { data: SlideData }) {
           {titleText}
         </div>
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", maxWidth: 420 }}>
-          <LogoFallback label={opDisplay} />
+          {(() => {
+            const logo = getOperatorLogo(data.op);
+            return logo ? (
+              <img src={logo} alt={opDisplay} crossOrigin="anonymous" style={{ maxHeight: 90, maxWidth: 400, objectFit: "contain", display: "block" }} />
+            ) : (
+              <LogoFallback label={opDisplay} />
+            );
+          })()}
         </div>
+
       </div>
 
       {/* Card */}
@@ -338,10 +365,27 @@ export function FechamentoModal({
     style: { transform: "none" },
   } as const;
 
+  async function waitForReady(root: HTMLElement) {
+    // fonts
+    try { await (document as any).fonts?.ready; } catch { /* noop */ }
+    // imagens
+    const imgs = Array.from(root.querySelectorAll("img")) as HTMLImageElement[];
+    await Promise.all(imgs.map((img) => {
+      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+      return new Promise<void>((res) => {
+        img.addEventListener("load", () => res(), { once: true });
+        img.addEventListener("error", () => res(), { once: true });
+      });
+    }));
+    // dois frames para garantir layout/paint do SVG
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  }
+
   async function exportPNG() {
     if (!slideRef.current) return;
     const t = toast.loading("Gerando PNG...");
     try {
+      await waitForReady(slideRef.current);
       const dataUrl = await toPng(slideRef.current, captureOpts);
       const a = document.createElement("a");
       a.href = dataUrl;
@@ -373,8 +417,9 @@ export function FechamentoModal({
           wrap.appendChild(host);
           const root = createRoot(host);
           root.render(el);
-          await new Promise((r) => setTimeout(r, 300));
+          await new Promise((r) => setTimeout(r, 150));
           const target = host.firstElementChild as HTMLElement;
+          await waitForReady(target);
           const dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.92 });
           root.unmount();
           host.remove();
@@ -394,8 +439,10 @@ export function FechamentoModal({
         pdf.save(`Fechamento_Consolidado_${mesNome}_${ano}.pdf`);
       } else {
         if (!slideRef.current) return;
+        await waitForReady(slideRef.current);
         const dataUrl = await toJpeg(slideRef.current, { ...captureOpts, quality: 0.92 });
         pdf.addImage(dataUrl, "JPEG", 0, 0, 1672, 941);
+
         pdf.save(`fechamento_${operadora}_${mesKey}.pdf`);
       }
       toast.success("PDF exportado", { id: t });
