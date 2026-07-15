@@ -212,19 +212,29 @@ export function DashboardTab({ state }: { state: State }) {
 function TwoLineTick(props: any) {
   const { x, y, payload } = props;
   const label: string = payload?.value ?? "";
-  // split em 2 linhas: primeira palavra em cima, resto embaixo
-  const parts = label.split(/\s+/);
-  const line1 = parts[0] ?? "";
-  const line2 = parts.slice(1).join(" ");
+  const parts = label.split(/\s+/).filter(Boolean);
+  // Distribui palavras em até 3 linhas para caber sob a barra sem sobrepor
+  const lines: string[] = [];
+  if (parts.length <= 1) {
+    lines.push(parts[0] ?? "");
+  } else if (parts.length === 2) {
+    lines.push(parts[0], parts[1]);
+  } else {
+    const mid = Math.ceil(parts.length / 2);
+    lines.push(parts.slice(0, mid).join(" "));
+    lines.push(parts.slice(mid).join(" "));
+  }
   return (
-    <g transform={`translate(${x},${y + 12})`}>
-      <text textAnchor="middle" fill="#aaa" fontSize={11}>
-        <tspan x={0} dy={0}>{line1}</tspan>
-        {line2 && <tspan x={0} dy={13}>{line2}</tspan>}
+    <g transform={`translate(${x},${y + 10})`}>
+      <text textAnchor="middle" fill="#cfd0d6" fontSize={10}>
+        {lines.map((ln, i) => (
+          <tspan key={i} x={0} dy={i === 0 ? 0 : 12}>{ln}</tspan>
+        ))}
       </text>
     </g>
   );
 }
+
 
 
 function Stat({ label, value, tone }: { label: string; value: any; tone?: "success" | "warn" }) {
