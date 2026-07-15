@@ -7,22 +7,44 @@ import jsPDF from "jspdf";
 import { toast } from "sonner";
 import unimedLogo from "@/assets/logos/unimed.png";
 import unimedEncostaLogo from "@/assets/logos/unimed-encosta-da-serra.png";
+import unimedCamposLogo from "@/assets/logos/unimed-campos.png";
+import unimedFrancaLogo from "@/assets/logos/unimed-franca.png";
+import unimedGeraisLogo from "@/assets/logos/unimed-gerais-de-minas.png";
+import unimedMissoesLogo from "@/assets/logos/unimed-missoes.png";
+import unimedNordestePaulistaLogo from "@/assets/logos/unimed-nordeste-paulista.png";
+import unimedNoroesteParanaLogo from "@/assets/logos/unimed-noroeste-do-parana.png";
+import unimedSantaMariaLogo from "@/assets/logos/unimed-santa-maria.png";
+import circuloSaudeLogo from "@/assets/logos/circulo-saude.png";
 
-/* ── Mapa de logos por operadora ───────────────────────────────────────── */
+/* ── Mapa de logos por operadora (chave = nome normalizado) ────────────── */
 function normalizeOp(s: string): string {
   return (s || "")
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .toUpperCase().replace(/\s+/g, " ").trim();
 }
+const OPERATOR_LOGOS: Record<string, string> = {
+  "UNIMED ENCOSTA DA SERRA": unimedEncostaLogo,
+  "UNIMED CAMPOS": unimedCamposLogo,
+  "UNIMED FRANCA": unimedFrancaLogo,
+  "UNIMED GERAIS DE MINAS": unimedGeraisLogo,
+  "UNIMED MISSOES": unimedMissoesLogo,
+  "UNIMED NORDESTE PAULISTA": unimedNordestePaulistaLogo,
+  "UNIMED NOROESTE DO PARANA": unimedNoroesteParanaLogo,
+  "UNIMED SANTA MARIA": unimedSantaMariaLogo,
+  "CIRCULO SAUDE": circuloSaudeLogo,
+};
 function getOperatorLogo(op: string): string | null {
   const n = normalizeOp(op);
   if (!n) return null;
-  // logos específicas
-  if (n === "UNIMED ENCOSTA DA SERRA" || n === "ENCOSTA DA SERRA") return unimedEncostaLogo;
+  if (OPERATOR_LOGOS[n]) return OPERATOR_LOGOS[n];
+  // remove prefixo "UNIMED " e tenta de novo
+  const noPrefix = n.replace(/^UNIMED\s+/, "");
+  if (OPERATOR_LOGOS[`UNIMED ${noPrefix}`]) return OPERATOR_LOGOS[`UNIMED ${noPrefix}`];
   // fallback: qualquer UNIMED usa a logo limpa
   if (n.startsWith("UNIMED")) return unimedLogo;
   return null;
 }
+
 
 
 /* ── Paleta fixa por categoria (idem fechamento-shared.js) ─────────────── */
