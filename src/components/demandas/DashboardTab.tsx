@@ -87,10 +87,10 @@ export function DashboardTab({ state }: { state: State }) {
   })), [filtered]);
 
   const evolucao = useMemo(() => {
-    // Últimos 6 meses a partir de hoje, sempre presentes (mesmo com 0)
+    // 12 meses até o mês atual, sempre presentes (mesmo com 0)
     const now = new Date();
     const out: { name: string; total: number }[] = [];
-    for (let i = 5; i >= 0; i--) {
+    for (let i = 11; i >= 0; i--) {
       const dt = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const y = dt.getFullYear();
       const m = String(dt.getMonth() + 1).padStart(2, "0");
