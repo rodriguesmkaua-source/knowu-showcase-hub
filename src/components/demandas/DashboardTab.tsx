@@ -217,38 +217,112 @@ function Stat({ label, value, tone }: { label: string; value: any; tone?: "succe
   );
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+  "Agendamento EQ": "#03914C",
+  "Reenvio de assinatura médica": "#F15A24",
+  "Aguardando assinatura do médico": "#1F5C18",
+  "N° Incorreto": "#A6A6A6",
+  "Reagendamento EQ": "#D9530A",
+  "Modificar Cadastro": "#8A9586",
+  "Link de assinatura": "#3B6FA0",
+  "Cadastro não localizado": "#B23A48",
+  "Outro": "#8C8C8C",
+};
+function colorForTipo(tipo: string, fallback: string): string {
+  if (CATEGORY_COLORS[tipo]) return CATEGORY_COLORS[tipo];
+  return fallback;
+}
+
 function OperadoraPanel({ demandas, operadora, onGerar, colors }: { demandas: Demanda[]; operadora: string; onGerar: () => void; colors: string[] }) {
   const total = demandas.length;
-  const tipos = TIPOS.map((t) => ({ name: t, total: demandas.filter((d) => d.tipo === t).length })).filter((x) => x.total > 0);
+  const resolvidas = demandas.filter((d) => d.status === "Resolvido").length;
+  const pendentes = total - resolvidas;
+  const taxa = total ? Math.round((resolvidas / total) * 100) : 0;
+
+  const tipos = TIPOS
+    .map((t, i) => ({ name: t, total: demandas.filter((d) => d.tipo === t).length, fill: colorForTipo(t, colors[i % colors.length]) }))
+    .filter((x) => x.total > 0)
+    .sort((a, b) => b.total - a.total);
 
   return (
     <div className="glass rounded-xl p-5">
-      <div className="flex items-center justify-between mb-4">
-        <div>
+      <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
+        <div className="min-w-0">
           <div className="text-[10px] font-mono uppercase tracking-widest text-accent">Operadora</div>
-          <div className="text-lg font-semibold">{operadora}</div>
+          <div className="text-xl font-semibold truncate">{operadora}</div>
         </div>
-        <button onClick={onGerar} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-black font-semibold text-sm shadow-[var(--glow-accent)]"><FileText className="w-4 h-4" /> Gerar Fechamento</button>
+        <div className="flex items-center gap-2">
+          <KpiPill label="Total" value={total} />
+          <KpiPill label="Resolvidas" value={resolvidas} tone="success" />
+          <KpiPill label="Pendentes" value={pendentes} tone="warn" />
+          <KpiPill label="% resol." value={`${taxa}%`} />
+          <button onClick={onGerar} className="ml-2 flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-black font-semibold text-sm shadow-[var(--glow-accent)] hover:brightness-110 transition">
+            <FileText className="w-4 h-4" /> Gerar Fechamento
+          </button>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <table className="w-full text-sm">
-          <thead className="text-[10px] font-mono uppercase text-muted-foreground border-b border-border">
-            <tr><th className="text-left py-2">Tipo</th><th className="text-right">Qtd</th><th className="text-right">%</th></tr>
-          </thead>
-          <tbody>
-            {tipos.map((t) => (
-              <tr key={t.name} className="border-b border-border/40">
-                <td className="py-1.5">{t.name}</td>
-                <td className="text-right font-mono">{t.total}</td>
-                <td className="text-right font-mono text-muted-foreground">{total ? Math.round((t.total / total) * 100) : 0}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={tipos} layout="vertical"><XAxis type="number" tick={{ fill: "#888", fontSize: 10 }} /><YAxis dataKey="name" type="category" width={140} tick={{ fill: "#888", fontSize: 10 }} /><Tooltip contentStyle={{ background: "#111118", border: "1px solid #333" }} /><Bar dataKey="total" radius={[0, 6, 6, 0]}>{tipos.map((_, i) => <Cell key={i} fill={colors[i % colors.length]} />)}</Bar></BarChart>
-        </ResponsiveContainer>
-      </div>
+
+      {tipos.length === 0 ? (
+        <div className="text-center py-16 text-muted-foreground text-sm">Sem demandas para o filtro atual.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_1.1fr] gap-6 items-center">
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={tipos}
+                  dataKey="total"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={72}
+                  outerRadius={120}
+                  paddingAngle={2}
+                  stroke="rgba(0,0,0,0.25)"
+                  strokeWidth={1}
+                >
+                  {tipos.map((t) => <Cell key={t.name} fill={t.fill} />)}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8, fontSize: 12 }}
+                  formatter={(v: number, n: string) => [`${v} (${total ? Math.round((v / total) * 100) : 0}%)`, n]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div className="text-3xl font-bold">{total}</div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">demandas</div>
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            {tipos.map((t) => {
+              const pct = total ? Math.round((t.total / total) * 100) : 0;
+              return (
+                <div key={t.name} className="flex items-center gap-3 py-1.5 border-b border-border/40 last:border-0">
+                  <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: t.fill }} />
+                  <span className="flex-1 text-sm truncate">{t.name}</span>
+                  <span className="w-24 h-1.5 rounded-full bg-surface overflow-hidden">
+                    <span className="block h-full rounded-full" style={{ width: `${pct}%`, background: t.fill }} />
+                  </span>
+                  <span className="text-sm font-mono w-8 text-right">{t.total}</span>
+                  <span className="text-xs font-mono w-10 text-right text-muted-foreground">{pct}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function KpiPill({ label, value, tone }: { label: string; value: any; tone?: "success" | "warn" }) {
+  const toneCls = tone === "success" ? "text-emerald-400" : tone === "warn" ? "text-yellow-400" : "text-foreground";
+  return (
+    <div className="px-3 py-1.5 rounded-lg bg-surface/60 border border-border/60">
+      <div className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground leading-none">{label}</div>
+      <div className={`text-base font-bold leading-tight ${toneCls}`}>{value}</div>
     </div>
   );
 }
