@@ -455,7 +455,7 @@ export function FechamentoModal({
           pdf.addImage(img, "JPEG", 0, 0, 1672, 941);
         }
         wrap.remove();
-        pdf.save(`Fechamento_Consolidado_${mesNome}_${ano}.pdf`);
+        pdf.save(`Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`);
       } else {
         if (!slideRef.current) return;
         await waitForReady(slideRef.current);
