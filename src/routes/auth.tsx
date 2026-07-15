@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Zap } from "lucide-react";
+import elephantIcon from "@/assets/elephant.png";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -36,7 +36,7 @@ function AuthPage() {
       <div className="w-full max-w-md glass rounded-2xl p-8 animate-fade-in">
         <div className="flex items-center gap-3 mb-8">
           <div className="w-11 h-11 rounded-xl gradient-primary flex items-center justify-center shadow-[var(--glow-primary)]">
-            <Zap className="w-5 h-5 text-white" strokeWidth={2.5} />
+            <img src={elephantIcon} alt="" className="w-6 h-6 object-contain" width={512} height={512} loading="lazy" />
           </div>
           <div>
             <div className="text-xs uppercase tracking-widest text-muted-foreground font-mono">KnowU</div>

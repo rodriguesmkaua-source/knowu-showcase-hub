@@ -10,7 +10,8 @@ import { KanbanTab } from "@/components/demandas/KanbanTab";
 import { AuditoriaTab } from "@/components/demandas/AuditoriaTab";
 import { ResumoDia } from "@/components/demandas/ResumoDia";
 import { slaFor } from "@/lib/demandas";
-import { LayoutDashboard, ListTodo, KanbanSquare, LogOut, Zap, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, ListTodo, KanbanSquare, LogOut, ShieldCheck } from "lucide-react";
+import elephantIcon from "@/assets/elephant.png";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app")({
@@ -99,7 +100,7 @@ function AppPage() {
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center shadow-[var(--glow-primary)]">
-                <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
+                <img src={elephantIcon} alt="" className="w-6 h-6 object-contain" width={512} height={512} loading="lazy" />
               </div>
               <div>
                 <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-mono leading-none">KnowU</div>
