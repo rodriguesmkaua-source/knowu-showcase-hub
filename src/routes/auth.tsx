@@ -11,7 +11,6 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,18 +23,8 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Conta criada");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
       navigate({ to: "/app" });
     } catch (err: any) {
       toast.error(err.message || "Falha na autenticação");
@@ -71,14 +60,13 @@ function AuthPage() {
             />
           </div>
           <button type="submit" disabled={loading} className="w-full gradient-primary text-white font-medium py-2.5 rounded-lg shadow-[var(--glow-primary)] disabled:opacity-60 transition">
-            {loading ? "..." : mode === "signin" ? "Entrar" : "Criar conta"}
+            {loading ? "..." : "Entrar"}
           </button>
         </form>
 
-        <button onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-4 w-full text-xs text-muted-foreground hover:text-foreground transition">
-          {mode === "signin" ? "Não tem conta? Criar" : "Já tem conta? Entrar"}
-        </button>
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          Acesso restrito. Contate o administrador para obter credenciais.
+        </p>
       </div>
     </div>
   );
