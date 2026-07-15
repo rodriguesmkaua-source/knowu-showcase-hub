@@ -798,15 +798,14 @@ function buildAnalise(wb, allItems) {
 
 // ── Injeta gráfico nativo no XLSX via JSZip ───────────────────────────────
 async function injectChart(buffer, { firstDataRow, lastDataRow }) {
-  let JSZip, zip
+  let zip
   try {
-    JSZip = null
-    zip   = await JSZip.loadAsync(buffer)
+    zip = await JSZip.loadAsync(buffer)
   } catch (e) {
-    // Se JSZip falhar, devolve o buffer original sem o gráfico nativo
     console.error('injectChart: JSZip falhou, exportando sem gráfico nativo:', e.message)
     return buffer
   }
+
   let files
   try {
     files = Object.keys(zip.files)
