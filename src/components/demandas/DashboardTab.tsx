@@ -193,7 +193,7 @@ export function DashboardTab({ state }: { state: State }) {
             <div className="text-sm font-semibold mb-3">Evolução mensal</div>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={evolucao} margin={{ top: 10, right: 20, left: 0, bottom: 6 }}>
-                <XAxis dataKey="name" tick={{ fill: "#aaa", fontSize: 12 }} />
+                <XAxis dataKey="name" tick={{ fill: "#aaa", fontSize: 12 }} interval={0} />
                 <YAxis tick={{ fill: "#aaa", fontSize: 12 }} allowDecimals={false} width={30} />
                 <Tooltip contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8 }} />
                 <Line type="monotone" dataKey="total" stroke="#7c6af7" strokeWidth={2.5} dot={{ fill: "#7c6af7", r: 4 }} activeDot={{ r: 6 }} />
