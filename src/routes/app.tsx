@@ -133,7 +133,7 @@ function AppPage() {
         </header>
 
         <div className="flex-1 p-6 overflow-y-auto">
-          {tab === "demandas" && <DemandasTab state={state} />}
+          {tab === "demandas" && <DemandasTab state={state} mesFilter={mesFilter} setMesFilter={setMesFilter} />}
           {tab === "dashboard" && <DashboardTab state={state} />}
           {tab === "kanban" && <KanbanTab state={state} />}
           {tab === "auditoria" && isAdmin && <AuditoriaTab />}
