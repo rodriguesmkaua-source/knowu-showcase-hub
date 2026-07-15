@@ -14,132 +14,16 @@ export type Database = {
   }
   public: {
     Tables: {
-      audit_log: {
-        Row: {
-          action: string
-          after_data: Json | null
-          before_data: Json | null
-          changed_fields: string[] | null
-          created_at: string
-          demanda_id: string | null
-          id: string
-          user_email: string | null
-          user_id: string | null
-        }
-        Insert: {
-          action: string
-          after_data?: Json | null
-          before_data?: Json | null
-          changed_fields?: string[] | null
-          created_at?: string
-          demanda_id?: string | null
-          id?: string
-          user_email?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          action?: string
-          after_data?: Json | null
-          before_data?: Json | null
-          changed_fields?: string[] | null
-          created_at?: string
-          demanda_id?: string | null
-          id?: string
-          user_email?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      demandas: {
-        Row: {
-          beneficiario: string
-          created_at: string
-          data: string
-          data_eq: string | null
-          hora: string
-          id: string
-          medica_responsavel: string | null
-          observacao: string | null
-          operadora: string
-          resolvido_em: string | null
-          solicitante: string
-          status: string
-          tipo: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          beneficiario: string
-          created_at?: string
-          data: string
-          data_eq?: string | null
-          hora: string
-          id?: string
-          medica_responsavel?: string | null
-          observacao?: string | null
-          operadora: string
-          resolvido_em?: string | null
-          solicitante: string
-          status?: string
-          tipo: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          beneficiario?: string
-          created_at?: string
-          data?: string
-          data_eq?: string | null
-          hora?: string
-          id?: string
-          medica_responsavel?: string | null
-          observacao?: string | null
-          operadora?: string
-          resolvido_em?: string | null
-          solicitante?: string
-          status?: string
-          tipo?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "user"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -266,8 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "user"],
-    },
+    Enums: {},
   },
 } as const
