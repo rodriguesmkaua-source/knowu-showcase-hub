@@ -9,7 +9,7 @@ import { Download, Save, Upload, History, PlusCircle } from "lucide-react";
 
 type State = ReturnType<typeof useDemandas>;
 
-export function Sidebar({ state }: { state: State }) {
+export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilter?: string }) {
   const { create, demandas, restore } = state;
   const [form, setForm] = useState({
     operadora: OPERADORAS[0], solicitante: "",
