@@ -357,6 +357,7 @@ export function FechamentoModal({
   const operadorasList = useMemo(() => {
     if (!isConsolidado) return [];
     const map = new Map<string, Demanda[]>();
+    OPERADORAS.forEach((op) => map.set(op, []));
     filtered.forEach((d) => {
       const arr = map.get(d.operadora) ?? [];
       arr.push(d);
