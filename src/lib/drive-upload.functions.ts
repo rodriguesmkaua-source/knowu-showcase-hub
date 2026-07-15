@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const DRIVE_FOLDER_ID = "1_vr8sCk0xYuUX2FCaQndgL4LnuL9vKX6";
+const DRIVE_FOLDER_ID = "16yaWz2Ati8lhL6dkksbvCeOMUF6KO3TE";
 const GATEWAY_UPLOAD_URL =
   "https://connector-gateway.lovable.dev/google_drive/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true";
 
