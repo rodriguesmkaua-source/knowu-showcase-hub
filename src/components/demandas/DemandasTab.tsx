@@ -86,15 +86,9 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       </div>
 
       {/* Search + filters */}
-      <div className="filter-panel group relative glass rounded-xl p-4 space-y-3 overflow-hidden transition-all duration-300 hover:border-primary/40 hover:shadow-[0_0_32px_-8px_oklch(0.63_0.22_285/0.45)]">
-        {/* Animated gradient sweep on hover */}
-        <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-             style={{
-               background: "linear-gradient(120deg, transparent 30%, oklch(0.63 0.22 285 / 0.08) 50%, oklch(0.71 0.19 55 / 0.06) 65%, transparent 80%)",
-               backgroundSize: "200% 100%",
-               animation: "filter-sweep 3.5s linear infinite",
-             }} />
+      <div className="filter-panel group glass rounded-xl p-4 space-y-3">
         <div className="relative">
+
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors group-hover:text-primary" />
           <input
             value={q} onChange={(e) => setQ(e.target.value)}

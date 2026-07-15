@@ -106,7 +106,7 @@ export function DashboardTab({ state }: { state: State }) {
   return (
     <div className="space-y-4">
       {/* Filtros topo */}
-      <div className="glass rounded-xl p-4 flex flex-wrap gap-3 items-center">
+      <div className="filter-panel glass rounded-xl p-4 flex flex-wrap gap-3 items-center">
         <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
           <option value="todos">Todos os meses</option>
           {mesesDisponiveis.map((k) => {

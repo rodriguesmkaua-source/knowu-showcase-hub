@@ -86,7 +86,7 @@ export function AuditoriaTab() {
         </button>
       </div>
 
-      <div className="glass rounded-xl p-3 flex items-center gap-3 flex-wrap">
+      <div className="filter-panel glass rounded-xl p-3 flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-2 flex-1 min-w-[240px]">
           <Search className="w-4 h-4 text-muted-foreground" />
           <input
