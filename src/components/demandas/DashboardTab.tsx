@@ -84,7 +84,7 @@ export function DashboardTab({ state }: { state: State }) {
   const byTipo = useMemo(() => TIPOS.map((t) => ({
     name: t,
     total: filtered.filter((d) => d.tipo === t).length,
-  })).filter((x) => x.total > 0), [filtered]);
+  })), [filtered]);
 
   const evolucao = useMemo(() => {
     const map = new Map<string, number>();
