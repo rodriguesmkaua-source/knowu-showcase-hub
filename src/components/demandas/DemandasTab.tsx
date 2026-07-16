@@ -1,8 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { useDemandas } from "@/hooks/use-demandas";
 import type { Demanda, Status } from "@/lib/demandas";
 import { STATUS_LIST, STATUS_COLORS, slaFor, nextStatus, highlightParts, MESES, OPERADORAS, TIPOS, TIPOS_COM_MEDICA, MEDICAS } from "@/lib/demandas";
 import { Search, Pencil, Trash2, X } from "lucide-react";
+import { useIsAdmin } from "@/hooks/use-admin";
+import { useServerFn } from "@tanstack/react-start";
+import { listUsers } from "@/lib/users-admin.functions";
 
 type State = ReturnType<typeof useDemandas>;
 
@@ -10,10 +13,19 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
   const { demandas, update, remove, bulkStatus } = state;
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "todos">("todos");
+  const [userFilter, setUserFilter] = useState<string>("todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<Demanda | null>(null);
+  const { isAdmin } = useIsAdmin();
+  const fetchUsers = useServerFn(listUsers);
+  const [users, setUsers] = useState<{ id: string; email: string }[]>([]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchUsers().then((list) => setUsers(list.map((u: any) => ({ id: u.id, email: u.email })))).catch(() => {});
+  }, [isAdmin, fetchUsers]);
 
   const stats = useMemo(() => ({
     total: demandas.length,
@@ -35,6 +47,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     const qq = q.trim().toLowerCase();
     return demandas.filter((d) => {
       if (statusFilter !== "todos" && d.status !== statusFilter) return false;
+      if (userFilter !== "todos" && d.user_id !== userFilter) return false;
       if (mesFilter !== "todos") {
         const [, m, y] = d.data.split("/");
         if (`${y}-${m}` !== mesFilter) return false;
@@ -51,7 +64,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       }
       return true;
     });
-  }, [demandas, q, statusFilter, mesFilter, dateFrom, dateTo]);
+  }, [demandas, q, statusFilter, userFilter, mesFilter, dateFrom, dateTo]);
 
   const toggleSel = (id: string) => {
     setSelected((prev) => {
@@ -113,6 +126,12 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
             );
           })}
           <div className="flex-1" />
+          {isAdmin && users.length > 0 && (
+            <select value={userFilter} onChange={(e) => setUserFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer max-w-[200px]" title="Filtrar por usuário">
+              <option value="todos">Todos os usuários</option>
+              {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
+            </select>
+          )}
           <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer">
             <option value="todos">Todos os meses</option>
             {mesesDisponiveis.map((k) => {

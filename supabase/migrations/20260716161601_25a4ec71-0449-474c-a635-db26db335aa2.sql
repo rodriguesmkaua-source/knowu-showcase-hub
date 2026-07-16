@@ -1,0 +1,1 @@
+CREATE POLICY "Admins can view all demandas" ON public.demandas FOR SELECT TO authenticated USING (public.has_role(auth.uid(), 'admin'));
