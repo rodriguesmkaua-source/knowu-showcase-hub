@@ -8,9 +8,10 @@ import { DemandasTab } from "@/components/demandas/DemandasTab";
 import { DashboardTab } from "@/components/demandas/DashboardTab";
 import { KanbanTab } from "@/components/demandas/KanbanTab";
 import { AuditoriaTab } from "@/components/demandas/AuditoriaTab";
+import { UsuariosTab } from "@/components/demandas/UsuariosTab";
 import { ResumoDia } from "@/components/demandas/ResumoDia";
 import { slaFor } from "@/lib/demandas";
-import { LayoutDashboard, ListTodo, KanbanSquare, LogOut, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, ListTodo, KanbanSquare, LogOut, ShieldCheck, Users } from "lucide-react";
 import elephantIcon from "@/assets/elephant.png";
 import { toast } from "sonner";
 
@@ -19,7 +20,7 @@ export const Route = createFileRoute("/app")({
   component: AppPage,
 });
 
-type Tab = "demandas" | "dashboard" | "kanban" | "auditoria";
+type Tab = "demandas" | "dashboard" | "kanban" | "auditoria" | "usuarios";
 
 function AppPage() {
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ function AppPage() {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "kanban", label: "Kanban", icon: KanbanSquare },
     ...(isAdmin ? [{ id: "auditoria" as Tab, label: "Auditoria", icon: ShieldCheck }] : []),
+    ...(isAdmin ? [{ id: "usuarios" as Tab, label: "Usuários", icon: Users }] : []),
   ];
 
   return (
@@ -138,6 +140,7 @@ function AppPage() {
           {tab === "dashboard" && <DashboardTab state={state} />}
           {tab === "kanban" && <KanbanTab state={state} />}
           {tab === "auditoria" && isAdmin && <AuditoriaTab />}
+          {tab === "usuarios" && isAdmin && <UsuariosTab />}
         </div>
       </main>
 
