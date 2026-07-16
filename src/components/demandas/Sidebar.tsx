@@ -116,27 +116,35 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
   }
   async function backupJSON(silent = false) {
     const json = JSON.stringify(demandas, null, 2);
-    // Download local
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).formatToParts(new Date()).reduce<Record<string, string>>((acc, p) => {
+      if (p.type !== "literal") acc[p.type] = p.value;
+      return acc;
+    }, {});
+    const stamp = `${parts.year}-${parts.month}-${parts.day}_${parts.hour}-${parts.minute}`;
+    const filename = `backup_${stamp}.json`;
+
+    // Download local (só no manual)
     if (!silent) {
       const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      const parts = new Intl.DateTimeFormat("en-CA", {
-        timeZone: "America/Sao_Paulo",
-        year: "numeric", month: "2-digit", day: "2-digit",
-        hour: "2-digit", minute: "2-digit", hour12: false,
-      }).formatToParts(new Date()).reduce<Record<string, string>>((acc, p) => {
-        if (p.type !== "literal") acc[p.type] = p.value;
-        return acc;
-      }, {});
-      const stamp = `${parts.year}-${parts.month}-${parts.day}_${parts.hour}-${parts.minute}`;
-      a.href = url; a.download = `backup_${stamp}.json`; a.click();
+      a.href = url; a.download = filename; a.click();
       URL.revokeObjectURL(url);
     }
-    // Upload para Drive (atualiza mesmo arquivo)
+    // Upload para Drive
+    // - manual (silent=false): cria arquivo novo com data/hora
+    // - automático (silent=true): atualiza o mesmo backup_demandas.json
     const toastId = silent ? undefined : toast.loading("Enviando backup para o Drive...");
     try {
-      await uploadBackupToDrive({ data: { json } });
+      await uploadBackupToDrive({
+        data: silent
+          ? { json, upsert: true }
+          : { json, filename, upsert: false },
+      });
       if (!silent) toast.success("Backup salvo no Google Drive", { id: toastId });
     } catch (err) {
       console.error(err);
