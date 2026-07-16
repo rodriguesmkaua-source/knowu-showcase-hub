@@ -177,8 +177,8 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
   );
 }
 
-function Card({ d, q, selected, onSelect, onCycleStatus, onEdit }: {
-  d: Demanda; q: string; selected: boolean;
+function Card({ d, q, selected, registeredBy, onSelect, onCycleStatus, onEdit }: {
+  d: Demanda; q: string; selected: boolean; registeredBy?: string;
   onSelect: () => void; onCycleStatus: () => void; onEdit: () => void;
 }) {
   const c = STATUS_COLORS[d.status];
