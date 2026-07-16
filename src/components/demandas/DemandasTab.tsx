@@ -207,6 +207,11 @@ function Card({ d, q, selected, registeredBy, onSelect, onCycleStatus, onEdit }:
           <span className={`ml-1 px-2 py-0.5 rounded-md border ${slaCls[sla.variant]}`}>{sla.label}</span>
           <span className="ml-auto text-[10px] uppercase tracking-widest">{d.solicitante}</span>
         </div>
+        {registeredBy && (
+          <div className="mt-1 text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">
+            Registrado por: <span className="text-primary/80">{registeredBy}</span>
+          </div>
+        )}
         <div className="mt-2 flex items-baseline gap-2 flex-wrap">
           <span className="text-[10px] font-mono uppercase tracking-widest text-accent">{d.tipo}</span>
           <span className="text-xs text-muted-foreground">·</span>
