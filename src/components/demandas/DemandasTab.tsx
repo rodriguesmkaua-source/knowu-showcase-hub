@@ -47,6 +47,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     const qq = q.trim().toLowerCase();
     return demandas.filter((d) => {
       if (statusFilter !== "todos" && d.status !== statusFilter) return false;
+      if (userFilter !== "todos" && d.user_id !== userFilter) return false;
       if (mesFilter !== "todos") {
         const [, m, y] = d.data.split("/");
         if (`${y}-${m}` !== mesFilter) return false;
@@ -63,7 +64,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       }
       return true;
     });
-  }, [demandas, q, statusFilter, mesFilter, dateFrom, dateTo]);
+  }, [demandas, q, statusFilter, userFilter, mesFilter, dateFrom, dateTo]);
 
   const toggleSel = (id: string) => {
     setSelected((prev) => {
