@@ -182,7 +182,7 @@ export function DashboardTab({ state }: { state: State }) {
             <div className="text-sm font-semibold mb-3">Por tipo</div>
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={byTipo} layout="vertical" margin={{ top: 6, right: 24, left: 8, bottom: 6 }}>
-                <XAxis type="number" tick={{ fill: "#aaa", fontSize: 11 }} allowDecimals={false} />
+                <XAxis type="number" tick={{ fill: "#aaa", fontSize: 11 }} allowDecimals={false} domain={[0, 20]} ticks={[0, 5, 10, 15, 20]} />
                 <YAxis dataKey="name" type="category" width={180} tick={{ fill: "#ddd", fontSize: 11 }} />
                 <Tooltip contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8 }} cursor={{ fill: "rgba(244,123,32,0.08)" }} />
                 <Bar dataKey="total" fill="#F47B20" radius={[0, 6, 6, 0]} maxBarSize={22} />
