@@ -252,7 +252,7 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
         <button onClick={exportExcel} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-accent/15 text-accent hover:bg-accent/25 transition border border-accent/30">
           <Download className="w-3.5 h-3.5" /> Excel
         </button>
-        <button onClick={backupJSON} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-surface border border-border hover:border-primary/50 transition">
+        <button onClick={() => backupJSON()} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-surface border border-border hover:border-primary/50 transition">
           <Save className="w-3.5 h-3.5" /> Backup
         </button>
         <button onClick={() => fileRef.current?.click()} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-surface border border-border hover:border-primary/50 transition">
