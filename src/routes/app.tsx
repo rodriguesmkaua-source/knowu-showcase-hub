@@ -89,6 +89,7 @@ function AppPage() {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "kanban", label: "Kanban", icon: KanbanSquare },
     ...(isAdmin ? [{ id: "auditoria" as Tab, label: "Auditoria", icon: ShieldCheck }] : []),
+    ...(isAdmin ? [{ id: "usuarios" as Tab, label: "Usuários", icon: Users }] : []),
   ];
 
   return (
