@@ -8,9 +8,10 @@ import { DemandasTab } from "@/components/demandas/DemandasTab";
 import { DashboardTab } from "@/components/demandas/DashboardTab";
 import { KanbanTab } from "@/components/demandas/KanbanTab";
 import { AuditoriaTab } from "@/components/demandas/AuditoriaTab";
+import { UsuariosTab } from "@/components/demandas/UsuariosTab";
 import { ResumoDia } from "@/components/demandas/ResumoDia";
 import { slaFor } from "@/lib/demandas";
-import { LayoutDashboard, ListTodo, KanbanSquare, LogOut, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, ListTodo, KanbanSquare, LogOut, ShieldCheck, Users } from "lucide-react";
 import elephantIcon from "@/assets/elephant.png";
 import { toast } from "sonner";
 
