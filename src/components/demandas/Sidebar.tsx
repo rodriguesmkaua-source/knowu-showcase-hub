@@ -4,6 +4,7 @@ import { OPERADORAS, TIPOS, TIPOS_COM_MEDICA, MEDICAS, STATUS_LIST, nowDataHora 
 import type { Demanda } from "@/lib/demandas";
 import { exportDemandasExcel } from "@/lib/excel-export";
 import { uploadExcelToDrive } from "@/lib/drive-upload.functions";
+import { uploadBackupToDrive } from "@/lib/drive-backup.functions";
 import { toast } from "sonner";
 import { Download, Save, Upload, History, PlusCircle } from "lucide-react";
 
@@ -113,23 +114,45 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
       toast.error("Erro ao exportar Excel");
     }
   }
-  function backupJSON() {
-    const blob = new Blob([JSON.stringify(demandas, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    const parts = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Sao_Paulo",
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hour12: false,
-    }).formatToParts(new Date()).reduce<Record<string, string>>((acc, p) => {
-      if (p.type !== "literal") acc[p.type] = p.value;
-      return acc;
-    }, {});
-    const stamp = `${parts.year}-${parts.month}-${parts.day}_${parts.hour}-${parts.minute}`;
-    a.href = url; a.download = `backup_${stamp}.json`; a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Backup gerado");
+  async function backupJSON(silent = false) {
+    const json = JSON.stringify(demandas, null, 2);
+    // Download local
+    if (!silent) {
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", hour12: false,
+      }).formatToParts(new Date()).reduce<Record<string, string>>((acc, p) => {
+        if (p.type !== "literal") acc[p.type] = p.value;
+        return acc;
+      }, {});
+      const stamp = `${parts.year}-${parts.month}-${parts.day}_${parts.hour}-${parts.minute}`;
+      a.href = url; a.download = `backup_${stamp}.json`; a.click();
+      URL.revokeObjectURL(url);
+    }
+    // Upload para Drive (atualiza mesmo arquivo)
+    const toastId = silent ? undefined : toast.loading("Enviando backup para o Drive...");
+    try {
+      await uploadBackupToDrive({ data: { json } });
+      if (!silent) toast.success("Backup salvo no Google Drive", { id: toastId });
+    } catch (err) {
+      console.error(err);
+      if (!silent) toast.error("Falha ao enviar backup para o Drive", { id: toastId });
+    }
   }
+
+  // Auto-backup a cada 2 horas
+  useEffect(() => {
+    if (!demandas.length) return;
+    const interval = setInterval(() => {
+      backupJSON(true);
+    }, 2 * 60 * 60 * 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demandas]);
   async function onRestore(f: File) {
     try {
       const txt = await f.text();
@@ -229,7 +252,7 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
         <button onClick={exportExcel} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-accent/15 text-accent hover:bg-accent/25 transition border border-accent/30">
           <Download className="w-3.5 h-3.5" /> Excel
         </button>
-        <button onClick={backupJSON} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-surface border border-border hover:border-primary/50 transition">
+        <button onClick={() => backupJSON()} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-surface border border-border hover:border-primary/50 transition">
           <Save className="w-3.5 h-3.5" /> Backup
         </button>
         <button onClick={() => fileRef.current?.click()} className="flex items-center justify-center gap-1.5 text-xs py-2 rounded-lg bg-surface border border-border hover:border-primary/50 transition">
