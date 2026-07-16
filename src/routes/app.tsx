@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app")({
   component: AppPage,
 });
 
-type Tab = "demandas" | "dashboard" | "kanban" | "auditoria";
+type Tab = "demandas" | "dashboard" | "kanban" | "auditoria" | "usuarios";
 
 function AppPage() {
   const navigate = useNavigate();
