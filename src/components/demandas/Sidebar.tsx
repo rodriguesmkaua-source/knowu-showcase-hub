@@ -96,30 +96,24 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
     try {
       const txt = await f.text();
       const parsed = JSON.parse(txt);
-      const arr: any[] = Array.isArray(parsed) ? parsed : parsed?.demandas;
-      if (!Array.isArray(arr)) throw new Error();
-      const normalized: Demanda[] = arr.map((r: any) => ({
-        id: typeof r.id === "string" ? r.id : undefined as any,
-        user_id: r.user_id ?? undefined as any,
-        data: r.data ?? "",
-        hora: r.hora ?? "",
-        operadora: r.operadora ?? r.op ?? "",
-        solicitante: r.solicitante ?? r.sol ?? "",
-        tipo: r.tipo ?? "",
-        beneficiario: r.beneficiario ?? r.ben ?? "",
-        medica_responsavel: r.medica_responsavel ?? r.medica ?? "",
-        data_eq: r.data_eq ?? r.dataeq ?? "",
-        observacao: r.observacao ?? r.obs ?? "",
-        status: r.status ?? "Aberto",
-        resolvido_em: r.resolvido_em ?? r.resolvidoEm ?? null,
-        created_at: r.created_at ?? undefined as any,
-        updated_at: r.updated_at ?? undefined as any,
-      }));
+      const arr: any[] = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.demandas)
+          ? parsed.demandas
+          : Array.isArray(parsed?.items)
+            ? parsed.items
+            : Array.isArray(parsed?.data)
+              ? parsed.data
+              : [];
+      if (!Array.isArray(arr) || arr.length === 0) throw new Error("Nenhuma demanda encontrada no JSON");
+      const normalized: Demanda[] = arr.map(normalizeRestoredDemanda);
       if (!normalized.length) throw new Error();
       await restore(normalized);
     } catch (e) {
       console.error("restore error", e);
-      toast.error("Arquivo inválido");
+      toast.error(e instanceof Error ? e.message : "Arquivo inválido");
+    } finally {
+      if (fileRef.current) fileRef.current.value = "";
     }
   }
 

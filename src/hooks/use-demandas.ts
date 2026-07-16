@@ -63,16 +63,36 @@ export function useDemandas() {
 
   const restore = async (items: Demanda[]) => {
     const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
+    if (!userData.user) {
+      toast.error("Faça login antes de restaurar o backup");
+      return;
+    }
+
     const payload = items.map((it) => ({
-      ...it,
-      id: undefined,
       user_id: userData.user!.id,
-      created_at: undefined,
-      updated_at: undefined,
+      data: it.data || "01/01/2026",
+      hora: it.hora || "00:00",
+      operadora: it.operadora || "Não informado",
+      solicitante: it.solicitante || "Não informado",
+      tipo: it.tipo || "Outro",
+      beneficiario: it.beneficiario || "Não informado",
+      medica_responsavel: it.medica_responsavel || null,
+      data_eq: it.data_eq || null,
+      status: it.status || "Aberto",
+      observacao: it.observacao || "",
+      resolvido_em: it.resolvido_em || null,
     }));
-    const { error } = await supabase.from("demandas").insert(payload);
-    if (error) { toast.error("Erro na restauração"); return; }
+
+    for (let i = 0; i < payload.length; i += 50) {
+      const chunk = payload.slice(i, i + 50);
+      const { error } = await supabase.from("demandas").insert(chunk);
+      if (error) {
+        console.error("restore insert error", error);
+        toast.error(`Erro na restauração: ${error.message}`);
+        return;
+      }
+    }
+
     await load();
     toast.success(`${items.length} demanda(s) restauradas`);
   };
