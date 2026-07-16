@@ -173,7 +173,7 @@ export async function uploadFileToDrive(opts: {
       Authorization: `Bearer ${accessToken}`,
       "Content-Type": `multipart/related; boundary=${boundary}`,
     },
-    body,
+    body: new Uint8Array(body),
   });
 
   if (!res.ok) {
