@@ -79,7 +79,16 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
     const blob = new Blob([JSON.stringify(demandas, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = `backup_demandas_${new Date().toISOString().slice(0, 10)}.json`; a.click();
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).formatToParts(new Date()).reduce<Record<string, string>>((acc, p) => {
+      if (p.type !== "literal") acc[p.type] = p.value;
+      return acc;
+    }, {});
+    const stamp = `${parts.year}-${parts.month}-${parts.day}_${parts.hour}-${parts.minute}`;
+    a.href = url; a.download = `backup_${stamp}.json`; a.click();
     URL.revokeObjectURL(url);
     toast.success("Backup gerado");
   }
