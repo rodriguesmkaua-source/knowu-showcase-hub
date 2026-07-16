@@ -140,6 +140,7 @@ function AppPage() {
           {tab === "dashboard" && <DashboardTab state={state} />}
           {tab === "kanban" && <KanbanTab state={state} />}
           {tab === "auditoria" && isAdmin && <AuditoriaTab />}
+          {tab === "usuarios" && isAdmin && <UsuariosTab />}
         </div>
       </main>
 
