@@ -4,6 +4,7 @@ import { OPERADORAS, TIPOS, TIPOS_COM_MEDICA, MEDICAS, STATUS_LIST, nowDataHora 
 import type { Demanda } from "@/lib/demandas";
 import { exportDemandasExcel } from "@/lib/excel-export";
 import { uploadExcelToDrive } from "@/lib/drive-upload.functions";
+import { uploadBackupToDrive } from "@/lib/drive-backup.functions";
 import { toast } from "sonner";
 import { Download, Save, Upload, History, PlusCircle } from "lucide-react";
 
