@@ -1,8 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { useDemandas } from "@/hooks/use-demandas";
 import type { Demanda, Status } from "@/lib/demandas";
 import { STATUS_LIST, STATUS_COLORS, slaFor, nextStatus, highlightParts, MESES, OPERADORAS, TIPOS, TIPOS_COM_MEDICA, MEDICAS } from "@/lib/demandas";
 import { Search, Pencil, Trash2, X } from "lucide-react";
+import { useIsAdmin } from "@/hooks/use-admin";
+import { useServerFn } from "@tanstack/react-start";
+import { listUsers } from "@/lib/users-admin.functions";
 
 type State = ReturnType<typeof useDemandas>;
 
@@ -10,10 +13,19 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
   const { demandas, update, remove, bulkStatus } = state;
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "todos">("todos");
+  const [userFilter, setUserFilter] = useState<string>("todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [editing, setEditing] = useState<Demanda | null>(null);
+  const { isAdmin } = useIsAdmin();
+  const fetchUsers = useServerFn(listUsers);
+  const [users, setUsers] = useState<{ id: string; email: string }[]>([]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetchUsers().then((list) => setUsers(list.map((u: any) => ({ id: u.id, email: u.email })))).catch(() => {});
+  }, [isAdmin, fetchUsers]);
 
   const stats = useMemo(() => ({
     total: demandas.length,
