@@ -95,10 +95,32 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
   async function onRestore(f: File) {
     try {
       const txt = await f.text();
-      const arr = JSON.parse(txt);
+      const parsed = JSON.parse(txt);
+      const arr: any[] = Array.isArray(parsed) ? parsed : parsed?.demandas;
       if (!Array.isArray(arr)) throw new Error();
-      await restore(arr as Demanda[]);
-    } catch { toast.error("Arquivo inválido"); }
+      const normalized: Demanda[] = arr.map((r: any) => ({
+        id: typeof r.id === "string" ? r.id : undefined as any,
+        user_id: r.user_id ?? undefined as any,
+        data: r.data ?? "",
+        hora: r.hora ?? "",
+        operadora: r.operadora ?? r.op ?? "",
+        solicitante: r.solicitante ?? r.sol ?? "",
+        tipo: r.tipo ?? "",
+        beneficiario: r.beneficiario ?? r.ben ?? "",
+        medica_responsavel: r.medica_responsavel ?? r.medica ?? "",
+        data_eq: r.data_eq ?? r.dataeq ?? "",
+        observacao: r.observacao ?? r.obs ?? "",
+        status: r.status ?? "Aberto",
+        resolvido_em: r.resolvido_em ?? r.resolvidoEm ?? null,
+        created_at: r.created_at ?? undefined as any,
+        updated_at: r.updated_at ?? undefined as any,
+      }));
+      if (!normalized.length) throw new Error();
+      await restore(normalized);
+    } catch (e) {
+      console.error("restore error", e);
+      toast.error("Arquivo inválido");
+    }
   }
 
   const inpCls = "w-full rounded-lg bg-input border border-border px-3 py-2 text-sm outline-none focus:border-primary focus:shadow-[0_0_0_3px_oklch(0.63_0.22_285/0.15)] transition";
