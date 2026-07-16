@@ -21,12 +21,34 @@ export const uploadBackupToDrive = createServerFn({ method: "POST" })
       "X-Connection-Api-Key": driveKey,
     };
 
+    // Descobre o driveId (caso a pasta esteja em Shared Drive)
+    const folderMetaRes = await fetch(
+      `${GATEWAY_BASE}/drive/v3/files/${DRIVE_FOLDER_ID}?fields=id,driveId&supportsAllDrives=true`,
+      { headers: authHeaders },
+    );
+    if (!folderMetaRes.ok) {
+      const err = await folderMetaRes.text();
+      throw new Error(`Falha ao acessar a pasta do Drive [${folderMetaRes.status}]: ${err}`);
+    }
+    const folderMeta = (await folderMetaRes.json()) as { driveId?: string };
+    const driveId = folderMeta.driveId;
+
     // Search for existing backup file in folder
     const q = encodeURIComponent(
       `name='${BACKUP_FILENAME}' and '${DRIVE_FOLDER_ID}' in parents and trashed=false`,
     );
+    const searchParams = new URLSearchParams({
+      q: decodeURIComponent(q),
+      fields: "files(id,name)",
+      supportsAllDrives: "true",
+      includeItemsFromAllDrives: "true",
+    });
+    if (driveId) {
+      searchParams.set("corpora", "drive");
+      searchParams.set("driveId", driveId);
+    }
     const searchRes = await fetch(
-      `${GATEWAY_BASE}/drive/v3/files?q=${q}&fields=files(id,name)&supportsAllDrives=true&includeItemsFromAllDrives=true`,
+      `${GATEWAY_BASE}/drive/v3/files?${searchParams.toString()}`,
       { headers: authHeaders },
     );
     if (!searchRes.ok) {
