@@ -9,6 +9,44 @@ import { Download, Save, Upload, History, PlusCircle } from "lucide-react";
 
 type State = ReturnType<typeof useDemandas>;
 
+const VALID_STATUS = new Set(STATUS_LIST);
+
+function textValue(value: unknown, fallback = "") {
+  if (value === null || value === undefined) return fallback;
+  const text = String(value).trim();
+  return text || fallback;
+}
+
+function nullableTextValue(value: unknown) {
+  const text = textValue(value);
+  return text || null;
+}
+
+function normalizeStatus(value: unknown): Demanda["status"] {
+  const status = textValue(value, "Aberto") as Demanda["status"];
+  return VALID_STATUS.has(status) ? status : "Aberto";
+}
+
+function normalizeRestoredDemanda(r: any): Demanda {
+  return {
+    id: typeof r?.id === "string" ? r.id : (undefined as any),
+    user_id: textValue(r?.user_id) as any,
+    data: textValue(r?.data, "01/01/2026"),
+    hora: textValue(r?.hora, "00:00"),
+    operadora: textValue(r?.operadora ?? r?.op, "Não informado"),
+    solicitante: textValue(r?.solicitante ?? r?.sol, "Não informado"),
+    tipo: textValue(r?.tipo, "Outro"),
+    beneficiario: textValue(r?.beneficiario ?? r?.ben, "Não informado"),
+    medica_responsavel: nullableTextValue(r?.medica_responsavel ?? r?.medica),
+    data_eq: nullableTextValue(r?.data_eq ?? r?.dataeq),
+    observacao: textValue(r?.observacao ?? r?.obs),
+    status: normalizeStatus(r?.status),
+    resolvido_em: nullableTextValue(r?.resolvido_em ?? r?.resolvidoEm),
+    created_at: textValue(r?.created_at) as any,
+    updated_at: textValue(r?.updated_at) as any,
+  };
+}
+
 export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilter?: string }) {
   const { create, demandas, restore } = state;
   const [form, setForm] = useState({
@@ -96,30 +134,24 @@ export function Sidebar({ state, mesFilter = "todos" }: { state: State; mesFilte
     try {
       const txt = await f.text();
       const parsed = JSON.parse(txt);
-      const arr: any[] = Array.isArray(parsed) ? parsed : parsed?.demandas;
-      if (!Array.isArray(arr)) throw new Error();
-      const normalized: Demanda[] = arr.map((r: any) => ({
-        id: typeof r.id === "string" ? r.id : undefined as any,
-        user_id: r.user_id ?? undefined as any,
-        data: r.data ?? "",
-        hora: r.hora ?? "",
-        operadora: r.operadora ?? r.op ?? "",
-        solicitante: r.solicitante ?? r.sol ?? "",
-        tipo: r.tipo ?? "",
-        beneficiario: r.beneficiario ?? r.ben ?? "",
-        medica_responsavel: r.medica_responsavel ?? r.medica ?? "",
-        data_eq: r.data_eq ?? r.dataeq ?? "",
-        observacao: r.observacao ?? r.obs ?? "",
-        status: r.status ?? "Aberto",
-        resolvido_em: r.resolvido_em ?? r.resolvidoEm ?? null,
-        created_at: r.created_at ?? undefined as any,
-        updated_at: r.updated_at ?? undefined as any,
-      }));
+      const arr: any[] = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.demandas)
+          ? parsed.demandas
+          : Array.isArray(parsed?.items)
+            ? parsed.items
+            : Array.isArray(parsed?.data)
+              ? parsed.data
+              : [];
+      if (!Array.isArray(arr) || arr.length === 0) throw new Error("Nenhuma demanda encontrada no JSON");
+      const normalized: Demanda[] = arr.map(normalizeRestoredDemanda);
       if (!normalized.length) throw new Error();
       await restore(normalized);
     } catch (e) {
       console.error("restore error", e);
-      toast.error("Arquivo inválido");
+      toast.error(e instanceof Error ? e.message : "Arquivo inválido");
+    } finally {
+      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
