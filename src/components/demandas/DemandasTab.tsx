@@ -148,11 +148,15 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       {/* Cards */}
       <div className="space-y-2 pb-24">
         {filtered.length === 0 && <div className="text-center py-16 text-muted-foreground font-mono text-sm">Nenhuma demanda encontrada</div>}
-        {filtered.map((d) => (
-          <Card key={d.id} d={d} q={q} selected={selected.has(d.id)} onSelect={() => toggleSel(d.id)}
-            onCycleStatus={() => update(d.id, { status: nextStatus(d.status) })}
-            onEdit={() => setEditing(d)} />
-        ))}
+        {filtered.map((d) => {
+          const email = users.find((u) => u.id === d.user_id)?.email;
+          return (
+            <Card key={d.id} d={d} q={q} selected={selected.has(d.id)} onSelect={() => toggleSel(d.id)}
+              registeredBy={email}
+              onCycleStatus={() => update(d.id, { status: nextStatus(d.status) })}
+              onEdit={() => setEditing(d)} />
+          );
+        })}
       </div>
 
       {/* Bulk bar */}
