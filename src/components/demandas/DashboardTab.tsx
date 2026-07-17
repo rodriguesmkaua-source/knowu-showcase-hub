@@ -313,9 +313,12 @@ function OperadoraPanel({ demandas, operadora, onGerar, colors }: { demandas: De
                   {tipos.map((t) => <Cell key={t.name} fill={t.fill} />)}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8, fontSize: 12 }}
+                  contentStyle={{ background: "#111118", border: "1px solid #333", borderRadius: 8, fontSize: 12, color: "#fff" }}
+                  itemStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#fff" }}
                   formatter={(v: number, n: string) => [`${v} (${total ? Math.round((v / total) * 100) : 0}%)`, n]}
                 />
+
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
