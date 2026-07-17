@@ -326,7 +326,7 @@ function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
       width: 1672, height: 941, position: "relative", overflow: "hidden",
       borderRadius: 6, background: C.cover, fontFamily: FONT,
     }}>
-      <img src={capaFechamentoAsset.url} alt="" crossOrigin="anonymous" style={{ position: "absolute", inset: 0, width: 1672, height: 941, display: "block" }} />
+      <img src={capaFechamentoUrl} alt="" style={{ position: "absolute", inset: 0, width: 1672, height: 941, display: "block" }} />
       <div style={{ position: "absolute", left: 99, top: 258, fontWeight: 800, lineHeight: 1.16, letterSpacing: -1.5 }}>
         <div style={{ fontSize: 104, color: C.navy }}>Fechamento</div>
         <div style={{ fontSize: 104 }}>
