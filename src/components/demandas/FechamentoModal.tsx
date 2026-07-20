@@ -359,9 +359,9 @@ export function FechamentoModal({
     const map = new Map<string, Demanda[]>();
     OPERADORAS.forEach((op) => map.set(op, []));
     filtered.forEach((d) => {
-      const arr = map.get(d.operadora) ?? [];
+      const arr = map.get(d.operadora);
+      if (!arr) return; // ignora operadora fora da lista canônica
       arr.push(d);
-      map.set(d.operadora, arr);
     });
     return Array.from(map.entries())
       .map(([op, arr]) => ({ op, arr }))
