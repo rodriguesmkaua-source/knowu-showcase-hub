@@ -14,6 +14,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "todos">("todos");
   const [userFilter, setUserFilter] = useState<string>("todos");
+  const [operadoraFilter, setOperadoraFilter] = useState<string>("todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -49,6 +50,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     return demandas.filter((d) => {
       if (statusFilter !== "todos" && d.status !== statusFilter) return false;
       if (userFilter !== "todos" && d.user_id !== userFilter) return false;
+      if (operadoraFilter !== "todos" && d.operadora !== operadoraFilter) return false;
       if (mesFilter !== "todos") {
         const [, m, y] = d.data.split("/");
         if (`${y}-${m}` !== mesFilter) return false;
@@ -65,7 +67,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       }
       return true;
     });
-  }, [demandas, q, statusFilter, userFilter, mesFilter, dateFrom, dateTo]);
+  }, [demandas, q, statusFilter, userFilter, operadoraFilter, mesFilter, dateFrom, dateTo]);
 
   const toggleSel = (id: string) => {
     setSelected((prev) => {
@@ -135,6 +137,10 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
               {users.map((u) => <option key={u.id} value={u.id}>{u.email}</option>)}
             </select>
           )}
+          <select value={operadoraFilter} onChange={(e) => setOperadoraFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer max-w-[200px]" title="Filtrar por operadora">
+            <option value="todos">Todas as operadoras</option>
+            {OPERADORAS.map((o) => <option key={o} value={o}>{o}</option>)}
+          </select>
           <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer">
             <option value="todos">Todos os meses</option>
             {mesesDisponiveis.map((k) => {
