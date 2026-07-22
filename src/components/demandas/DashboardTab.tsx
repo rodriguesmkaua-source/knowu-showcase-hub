@@ -233,7 +233,7 @@ export function DashboardTab({ state }: { state: State }) {
           </div>
         </div>
       ) : (
-        <OperadoraPanel demandas={filtered} operadora={opFilter} onGerar={() => setFechamento({ operadora: opFilter, mesKey: mesFilter !== "todos" ? mesFilter : mesAtual })} colors={COLORS} />
+        <OperadoraPanel demandas={filtered} operadora={opFilter} onGerar={() => setFechamento({ operadora: opFilter, mesKey: mesFilterEffective !== "todos" ? mesFilterEffective : (anoFilter !== "todos" ? `y-${anoFilter}` : mesAtual) })} colors={COLORS} />
       )}
 
       {fechamento && <FechamentoModal demandas={demandas} operadora={fechamento.operadora} mesKey={fechamento.mesKey} onClose={() => setFechamento(null)} />}
