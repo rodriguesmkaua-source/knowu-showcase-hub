@@ -551,10 +551,10 @@ export function FechamentoModal({
         {isConsolidado ? (
           <div className="space-y-6">
             <div ref={slideRef}>
-              <CoverSlide mes={mesNome} ano={ano} />
+              <CoverSlide mes={mesNome} ano={ano} anual={isAnoOnly} />
             </div>
             {operadorasList.map(({ op, arr }) => (
-              <SlideCard key={op} data={buildSlideData(arr, op, mesNome, ano)} />
+              <SlideCard key={op} data={buildSlideData(arr, op, mesNome, ano, isAnoOnly)} />
             ))}
             {operadorasList.length === 0 && (
               <div className="glass rounded-xl p-10 text-center text-muted-foreground">Nenhuma demanda no período.</div>
