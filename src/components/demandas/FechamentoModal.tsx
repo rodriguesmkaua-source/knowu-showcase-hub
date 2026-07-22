@@ -497,7 +497,7 @@ export function FechamentoModal({
         pdf.addImage(coverImg, "JPEG", 0, 0, 1672, 941);
 
         for (const { op, arr } of operadorasList) {
-          const data = buildSlideData(arr, op, mesNome, ano);
+          const data = buildSlideData(arr, op, mesNome, ano, isAnoOnly);
           const img = await renderAndCapture(React.createElement(SlideCard, { data }), C.page);
           pdf.addPage([1672, 941], "landscape");
           pdf.addImage(img, "JPEG", 0, 0, 1672, 941);
