@@ -381,9 +381,9 @@ export function FechamentoModal({
     height: 941,
     canvasWidth: 1672,
     canvasHeight: 941,
-    pixelRatio: 1.25,
+    pixelRatio: 2,
     backgroundColor: C.page,
-    cacheBust: true,
+    cacheBust: false,
     style: { transform: "none" },
   } as const;
 
