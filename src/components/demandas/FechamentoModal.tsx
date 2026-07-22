@@ -15,6 +15,7 @@ import unimedNordestePaulistaLogo from "@/assets/logos/unimed-nordeste-paulista.
 import unimedNoroesteParanaLogo from "@/assets/logos/unimed-noroeste-do-parana.png";
 import unimedSantaMariaLogo from "@/assets/logos/unimed-santa-maria.png";
 import unimedSaLogo from "@/assets/logos/unimed-sa.png";
+import unimedMedianeiraLogo from "@/assets/logos/unimed-medianeira.png";
 import circuloSaudeLogo from "@/assets/logos/circulo-saude.png";
 import capaFechamentoUrl from "@/assets/capa/capa-fechamento-base.png";
 
