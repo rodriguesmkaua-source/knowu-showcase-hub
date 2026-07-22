@@ -325,13 +325,25 @@ function KPI({ label, num, color, desc }: { label: string; num: number; color: s
 }
 
 /* ── Capa consolidada (fechamento-completo.html) ───────────────────────── */
-function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
+function CoverSlide({ mes, ano, anual = false }: { mes: string; ano: string; anual?: boolean }) {
   return (
     <div style={{
       width: 1672, height: 941, position: "relative", overflow: "hidden",
       borderRadius: 6, background: C.cover, fontFamily: FONT,
     }}>
       <img src={capaFechamentoUrl} alt="" style={{ position: "absolute", inset: 0, width: 1672, height: 941, display: "block" }} />
+      {anual && (
+        <div style={{
+          position: "absolute", left: 99, top: 96,
+          background: C.orange, color: "#fff",
+          fontSize: 40, fontWeight: 800, letterSpacing: 0.5,
+          padding: "18px 36px", borderRadius: 14,
+          lineHeight: 1, whiteSpace: "nowrap",
+          boxShadow: "0 6px 18px rgba(241,90,36,.35)",
+        }}>
+          RELATÓRIO ANUAL
+        </div>
+      )}
       <div style={{ position: "absolute", left: 99, top: 258, fontWeight: 800, lineHeight: 1.16, letterSpacing: -1.5 }}>
         <div style={{ fontSize: 104, color: C.navy }}>Fechamento</div>
         <div style={{ fontSize: 104 }}>
