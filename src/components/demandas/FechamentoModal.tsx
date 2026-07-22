@@ -381,9 +381,10 @@ export function FechamentoModal({
     height: 941,
     canvasWidth: 1672,
     canvasHeight: 941,
-    pixelRatio: 1.25,
+    pixelRatio: 2,
     backgroundColor: C.page,
-    cacheBust: true,
+    cacheBust: false,
+    skipFonts: true,
     style: { transform: "none" },
   } as const;
 
@@ -448,7 +449,7 @@ export function FechamentoModal({
           let dataUrl = "";
           for (let i = 0; i < 2; i++) {
             try {
-              dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.82 });
+              dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.92 });
               break;
             } catch (err) {
               if (i === 1) throw err;
