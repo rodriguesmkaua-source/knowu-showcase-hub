@@ -351,7 +351,7 @@ export function FechamentoModal({
 
   const isTodosMeses = mesKey === "todos";
   const [ano, mes] = isTodosMeses ? ["", ""] : mesKey.split("-");
-  const mesNome = isTodosMeses ? "Todos os meses" : (MESES[parseInt(mes) - 1] || "");
+  const mesNome = isTodosMeses ? "" : (MESES[parseInt(mes) - 1] || "");
 
   const filtered = useMemo(
     () => (isTodosMeses ? demandas : demandas.filter((d) => mesDaData(d.data).key === mesKey)),
