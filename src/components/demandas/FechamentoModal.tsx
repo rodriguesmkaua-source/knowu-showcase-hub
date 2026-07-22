@@ -381,7 +381,7 @@ export function FechamentoModal({
     height: 941,
     canvasWidth: 1672,
     canvasHeight: 941,
-    pixelRatio: 2,
+    pixelRatio: 1.25,
     backgroundColor: C.page,
     cacheBust: true,
     style: { transform: "none" },
@@ -440,15 +440,15 @@ export function FechamentoModal({
           const root = createRoot(host);
           root.render(el);
           // wait for React 18 async commit + layout
-          await new Promise((r) => setTimeout(r, 400));
+          await new Promise((r) => setTimeout(r, 120));
           const target = (host.firstElementChild as HTMLElement) || host;
           await waitForReady(target);
-          await new Promise((r) => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 30));
           // retry once on transient html-to-image failure
           let dataUrl = "";
           for (let i = 0; i < 2; i++) {
             try {
-              dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.9 });
+              dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.82 });
               break;
             } catch (err) {
               if (i === 1) throw err;
