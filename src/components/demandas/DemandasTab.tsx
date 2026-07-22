@@ -168,9 +168,10 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
               return <option key={k} value={k}>{MESES[parseInt(m) - 1]} {y}</option>;
             })}
           </select>
-          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none" />
-          <span className="text-xs text-muted-foreground">→</span>
-          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none" />
+          <div className="flex flex-col gap-1">
+            <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none" />
+            <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none" />
+          </div>
         </div>
       </div>
 
