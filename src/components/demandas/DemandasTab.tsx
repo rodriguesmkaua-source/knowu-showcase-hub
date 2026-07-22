@@ -50,6 +50,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     return demandas.filter((d) => {
       if (statusFilter !== "todos" && d.status !== statusFilter) return false;
       if (userFilter !== "todos" && d.user_id !== userFilter) return false;
+      if (operadoraFilter !== "todos" && d.operadora !== operadoraFilter) return false;
       if (mesFilter !== "todos") {
         const [, m, y] = d.data.split("/");
         if (`${y}-${m}` !== mesFilter) return false;
