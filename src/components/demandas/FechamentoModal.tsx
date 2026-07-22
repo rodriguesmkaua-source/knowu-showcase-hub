@@ -349,10 +349,14 @@ export function FechamentoModal({
 }: { demandas: Demanda[]; operadora: string | "TODAS"; mesKey: string; onClose: () => void }) {
   const slideRef = useRef<HTMLDivElement>(null);
 
-  const [ano, mes] = mesKey.split("-");
-  const mesNome = MESES[parseInt(mes) - 1] || "";
+  const isTodosMeses = mesKey === "todos";
+  const [ano, mes] = isTodosMeses ? ["", ""] : mesKey.split("-");
+  const mesNome = isTodosMeses ? "Todos os meses" : (MESES[parseInt(mes) - 1] || "");
 
-  const filtered = useMemo(() => demandas.filter((d) => mesDaData(d.data).key === mesKey), [demandas, mesKey]);
+  const filtered = useMemo(
+    () => (isTodosMeses ? demandas : demandas.filter((d) => mesDaData(d.data).key === mesKey)),
+    [demandas, mesKey, isTodosMeses],
+  );
 
   const isConsolidado = operadora === "TODAS";
 
