@@ -11,22 +11,42 @@ type State = ReturnType<typeof useDemandas>;
 export function DashboardTab({ state }: { state: State }) {
   const { demandas } = state;
   const [mesFilter, setMesFilter] = useState<string>("todos");
+  const [anoFilter, setAnoFilter] = useState<string>("todos");
   const [opFilter, setOpFilter] = useState<string>("todas");
   const [tipoFilter, setTipoFilter] = useState<string>("todos");
   const [fechamento, setFechamento] = useState<{ operadora: string | "TODAS"; mesKey: string } | null>(null);
 
-  const mesesDisponiveis = useMemo(() => {
+  const anosDisponiveis = useMemo(() => {
     const s = new Set<string>();
-    demandas.forEach((d) => s.add(mesDaData(d.data).key));
+    demandas.forEach((d) => {
+      const [, , y] = d.data.split("/");
+      if (y) s.add(y);
+    });
+    // garante ano atual sempre presente (para 2027 aparecer quando virar)
+    s.add(String(new Date().getFullYear()));
     return Array.from(s).sort().reverse();
   }, [demandas]);
 
+  const mesesDisponiveis = useMemo(() => {
+    const s = new Set<string>();
+    demandas.forEach((d) => {
+      const k = mesDaData(d.data).key;
+      if (anoFilter === "todos" || k.startsWith(`${anoFilter}-`)) s.add(k);
+    });
+    return Array.from(s).sort().reverse();
+  }, [demandas, anoFilter]);
+
+  // reset mês se sair do ano selecionado
+  const mesFilterEffective = mesFilter !== "todos" && anoFilter !== "todos" && !mesFilter.startsWith(`${anoFilter}-`) ? "todos" : mesFilter;
+
   const filtered = useMemo(() => demandas.filter((d) => {
-    if (mesFilter !== "todos" && mesDaData(d.data).key !== mesFilter) return false;
+    const key = mesDaData(d.data).key;
+    if (anoFilter !== "todos" && !key.startsWith(`${anoFilter}-`)) return false;
+    if (mesFilterEffective !== "todos" && key !== mesFilterEffective) return false;
     if (opFilter !== "todas" && d.operadora !== opFilter) return false;
     if (tipoFilter !== "todos" && d.tipo !== tipoFilter) return false;
     return true;
-  }), [demandas, mesFilter, opFilter, tipoFilter]);
+  }), [demandas, mesFilterEffective, anoFilter, opFilter, tipoFilter]);
 
   const today = new Date();
   const todayStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
