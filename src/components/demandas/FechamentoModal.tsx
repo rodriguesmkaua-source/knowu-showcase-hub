@@ -97,13 +97,14 @@ interface SlideData {
   maior: Tipo;
   assinatura: number;
   maxCount: number;
+  anual?: boolean;
 }
 
 function shortOpName(op: string): string {
   return op.replace(/^UNIMED\s+/i, "");
 }
 
-function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano: string): SlideData {
+function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano: string, anual = false): SlideData {
   const map = new Map<string, number>();
   demandas.forEach((d) => map.set(d.tipo, (map.get(d.tipo) ?? 0) + 1));
   const tipos = Array.from(map.entries())
@@ -114,7 +115,7 @@ function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano
   const countOf = (name: string) => (tipos.find((t) => t.tipo === name) || { count: 0 }).count;
   const assinatura = countOf("Reenvio de assinatura médica") + countOf("Aguardando assinatura do médico");
   const maxCount = tipos.length ? tipos[0].count : 0;
-  return { op: operadora, opDisplay: shortOpName(operadora), mes, ano, tipos, total, maior, assinatura, maxCount };
+  return { op: operadora, opDisplay: shortOpName(operadora), mes, ano, tipos, total, maior, assinatura, maxCount, anual };
 }
 
 /* ── Donut (canvas 386×386, R=193, r=92) — idêntico ao renderer original ─ */
@@ -239,7 +240,7 @@ function SlideCard({ data }: { data: SlideData }) {
         flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
         overflow: "hidden", position: "relative",
       }}>
-        <div style={{ fontSize: 27, fontWeight: 800, color: C.navy, lineHeight: 1.15 }}>Relatório mensal de demandas</div>
+        <div style={{ fontSize: 27, fontWeight: 800, color: C.navy, lineHeight: 1.15 }}>{data.anual ? "Relatório anual de demandas" : "Relatório mensal de demandas"}</div>
         {(mes || ano) && (
           <div style={{ fontSize: 17, fontWeight: 600, color: C.blue, marginTop: 4 }}>{ano ? `${mes} de ${ano}` : mes}</div>
         )}
@@ -324,13 +325,25 @@ function KPI({ label, num, color, desc }: { label: string; num: number; color: s
 }
 
 /* ── Capa consolidada (fechamento-completo.html) ───────────────────────── */
-function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
+function CoverSlide({ mes, ano, anual = false }: { mes: string; ano: string; anual?: boolean }) {
   return (
     <div style={{
       width: 1672, height: 941, position: "relative", overflow: "hidden",
       borderRadius: 6, background: C.cover, fontFamily: FONT,
     }}>
       <img src={capaFechamentoUrl} alt="" style={{ position: "absolute", inset: 0, width: 1672, height: 941, display: "block" }} />
+      {anual && (
+        <div style={{
+          position: "absolute", left: 99, top: 96,
+          background: C.orange, color: "#fff",
+          fontSize: 40, fontWeight: 800, letterSpacing: 0.5,
+          padding: "18px 36px", borderRadius: 14,
+          lineHeight: 1, whiteSpace: "nowrap",
+          boxShadow: "0 6px 18px rgba(241,90,36,.35)",
+        }}>
+          RELATÓRIO ANUAL
+        </div>
+      )}
       <div style={{ position: "absolute", left: 99, top: 258, fontWeight: 800, lineHeight: 1.16, letterSpacing: -1.5 }}>
         <div style={{ fontSize: 104, color: C.navy }}>Fechamento</div>
         <div style={{ fontSize: 104 }}>
@@ -392,7 +405,7 @@ export function FechamentoModal({
   const singleData = useMemo(() => {
     if (isConsolidado) return null;
     const arr = filtered.filter((d) => d.operadora === operadora);
-    return buildSlideData(arr, operadora, mesNome, ano);
+    return buildSlideData(arr, operadora, mesNome, ano, isAnoOnly);
   }, [filtered, operadora, isConsolidado, mesNome, ano]);
 
   const captureOpts = {
@@ -480,11 +493,11 @@ export function FechamentoModal({
           return dataUrl;
         }
 
-        const coverImg = await renderAndCapture(React.createElement(CoverSlide, { mes: mesNome, ano }), C.cover);
+        const coverImg = await renderAndCapture(React.createElement(CoverSlide, { mes: mesNome, ano, anual: isAnoOnly }), C.cover);
         pdf.addImage(coverImg, "JPEG", 0, 0, 1672, 941);
 
         for (const { op, arr } of operadorasList) {
-          const data = buildSlideData(arr, op, mesNome, ano);
+          const data = buildSlideData(arr, op, mesNome, ano, isAnoOnly);
           const img = await renderAndCapture(React.createElement(SlideCard, { data }), C.page);
           pdf.addPage([1672, 941], "landscape");
           pdf.addImage(img, "JPEG", 0, 0, 1672, 941);
@@ -538,10 +551,10 @@ export function FechamentoModal({
         {isConsolidado ? (
           <div className="space-y-6">
             <div ref={slideRef}>
-              <CoverSlide mes={mesNome} ano={ano} />
+              <CoverSlide mes={mesNome} ano={ano} anual={isAnoOnly} />
             </div>
             {operadorasList.map(({ op, arr }) => (
-              <SlideCard key={op} data={buildSlideData(arr, op, mesNome, ano)} />
+              <SlideCard key={op} data={buildSlideData(arr, op, mesNome, ano, isAnoOnly)} />
             ))}
             {operadorasList.length === 0 && (
               <div className="glass rounded-xl p-10 text-center text-muted-foreground">Nenhuma demanda no período.</div>
