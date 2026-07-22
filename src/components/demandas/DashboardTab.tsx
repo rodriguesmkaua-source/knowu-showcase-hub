@@ -11,22 +11,42 @@ type State = ReturnType<typeof useDemandas>;
 export function DashboardTab({ state }: { state: State }) {
   const { demandas } = state;
   const [mesFilter, setMesFilter] = useState<string>("todos");
+  const [anoFilter, setAnoFilter] = useState<string>("todos");
   const [opFilter, setOpFilter] = useState<string>("todas");
   const [tipoFilter, setTipoFilter] = useState<string>("todos");
   const [fechamento, setFechamento] = useState<{ operadora: string | "TODAS"; mesKey: string } | null>(null);
 
-  const mesesDisponiveis = useMemo(() => {
+  const anosDisponiveis = useMemo(() => {
     const s = new Set<string>();
-    demandas.forEach((d) => s.add(mesDaData(d.data).key));
+    demandas.forEach((d) => {
+      const [, , y] = d.data.split("/");
+      if (y) s.add(y);
+    });
+    // garante ano atual sempre presente (para 2027 aparecer quando virar)
+    s.add(String(new Date().getFullYear()));
     return Array.from(s).sort().reverse();
   }, [demandas]);
 
+  const mesesDisponiveis = useMemo(() => {
+    const s = new Set<string>();
+    demandas.forEach((d) => {
+      const k = mesDaData(d.data).key;
+      if (anoFilter === "todos" || k.startsWith(`${anoFilter}-`)) s.add(k);
+    });
+    return Array.from(s).sort().reverse();
+  }, [demandas, anoFilter]);
+
+  // reset mês se sair do ano selecionado
+  const mesFilterEffective = mesFilter !== "todos" && anoFilter !== "todos" && !mesFilter.startsWith(`${anoFilter}-`) ? "todos" : mesFilter;
+
   const filtered = useMemo(() => demandas.filter((d) => {
-    if (mesFilter !== "todos" && mesDaData(d.data).key !== mesFilter) return false;
+    const key = mesDaData(d.data).key;
+    if (anoFilter !== "todos" && !key.startsWith(`${anoFilter}-`)) return false;
+    if (mesFilterEffective !== "todos" && key !== mesFilterEffective) return false;
     if (opFilter !== "todas" && d.operadora !== opFilter) return false;
     if (tipoFilter !== "todos" && d.tipo !== tipoFilter) return false;
     return true;
-  }), [demandas, mesFilter, opFilter, tipoFilter]);
+  }), [demandas, mesFilterEffective, anoFilter, opFilter, tipoFilter]);
 
   const today = new Date();
   const todayStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
@@ -38,8 +58,8 @@ export function DashboardTab({ state }: { state: State }) {
   // KPIs vs mês anterior (respeita filtros). Quando "todos", usa todas as demandas filtradas e não há comparação.
   const now = new Date();
   const mesAtual = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const isTodos = mesFilter === "todos";
-  const mesRef = isTodos ? mesAtual : mesFilter;
+  const isTodos = mesFilterEffective === "todos";
+  const mesRef = isTodos ? mesAtual : mesFilterEffective;
   const [yRef, mRef] = mesRef.split("-").map((n) => parseInt(n));
   const prevD = new Date(yRef, mRef - 2, 1);
   const mesAnt = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, "0")}`;
@@ -112,7 +132,11 @@ export function DashboardTab({ state }: { state: State }) {
     <div className="space-y-4">
       {/* Filtros topo */}
       <div className="filter-panel glass rounded-xl p-4 flex flex-wrap gap-3 items-center">
-        <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
+        <select value={anoFilter} onChange={(e) => setAnoFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
+          <option value="todos">Todos os anos</option>
+          {anosDisponiveis.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <select value={mesFilterEffective} onChange={(e) => setMesFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
           <option value="todos">Todos os meses</option>
           {mesesDisponiveis.map((k) => {
             const [y, m] = k.split("-");
@@ -129,7 +153,7 @@ export function DashboardTab({ state }: { state: State }) {
         </select>
         <div className="flex-1" />
         <button
-          onClick={() => setFechamento({ operadora: "TODAS", mesKey: mesFilter })}
+          onClick={() => setFechamento({ operadora: "TODAS", mesKey: mesFilterEffective !== "todos" ? mesFilterEffective : (anoFilter !== "todos" ? `y-${anoFilter}` : "todos") })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium shadow-[var(--glow-primary)]"
         ><FileText className="w-4 h-4" /> Fechamento Completo</button>
       </div>
@@ -209,7 +233,7 @@ export function DashboardTab({ state }: { state: State }) {
           </div>
         </div>
       ) : (
-        <OperadoraPanel demandas={filtered} operadora={opFilter} onGerar={() => setFechamento({ operadora: opFilter, mesKey: mesFilter !== "todos" ? mesFilter : mesAtual })} colors={COLORS} />
+        <OperadoraPanel demandas={filtered} operadora={opFilter} onGerar={() => setFechamento({ operadora: opFilter, mesKey: mesFilterEffective !== "todos" ? mesFilterEffective : (anoFilter !== "todos" ? `y-${anoFilter}` : mesAtual) })} colors={COLORS} />
       )}
 
       {fechamento && <FechamentoModal demandas={demandas} operadora={fechamento.operadora} mesKey={fechamento.mesKey} onClose={() => setFechamento(null)} />}

@@ -354,12 +354,23 @@ export function FechamentoModal({
   const slideRef = useRef<HTMLDivElement>(null);
 
   const isTodosMeses = mesKey === "todos";
-  const [ano, mes] = isTodosMeses ? ["", ""] : mesKey.split("-");
-  const mesNome = isTodosMeses ? "" : (MESES[parseInt(mes) - 1] || "");
+  const isAnoOnly = mesKey.startsWith("y-");
+  const anoOnly = isAnoOnly ? mesKey.slice(2) : "";
+  const [anoRaw, mesRaw] = isTodosMeses || isAnoOnly ? ["", ""] : mesKey.split("-");
+  const ano = isAnoOnly ? anoOnly : anoRaw;
+  const mes = mesRaw;
+  const mesNome = isTodosMeses || isAnoOnly ? "" : (MESES[parseInt(mes) - 1] || "");
 
   const filtered = useMemo(
-    () => (isTodosMeses ? demandas : demandas.filter((d) => mesDaData(d.data).key === mesKey)),
-    [demandas, mesKey, isTodosMeses],
+    () => {
+      if (isTodosMeses) return demandas;
+      if (isAnoOnly) return demandas.filter((d) => {
+        const [, , y] = d.data.split("/");
+        return y === anoOnly;
+      });
+      return demandas.filter((d) => mesDaData(d.data).key === mesKey);
+    },
+    [demandas, mesKey, isTodosMeses, isAnoOnly, anoOnly],
   );
 
   const isConsolidado = operadora === "TODAS";
@@ -479,7 +490,12 @@ export function FechamentoModal({
           pdf.addImage(img, "JPEG", 0, 0, 1672, 941);
         }
         wrap.remove();
-        pdf.save(isTodosMeses ? `Fechamento_Consolidado_TODOS_OS_MESES.pdf` : `Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`);
+        const fname = isTodosMeses
+          ? `Fechamento_Consolidado_TODOS_OS_MESES.pdf`
+          : isAnoOnly
+            ? `Fechamento_Consolidado_ANO_${anoOnly}.pdf`
+            : `Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`;
+        pdf.save(fname);
       } else {
         if (!slideRef.current) return;
         await waitForReady(slideRef.current);

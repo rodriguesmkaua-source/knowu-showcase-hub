@@ -15,6 +15,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
   const [statusFilter, setStatusFilter] = useState<Status | "todos">("todos");
   const [userFilter, setUserFilter] = useState<string>("todos");
   const [operadoraFilter, setOperadoraFilter] = useState<string>("todos");
+  const [anoFilter, setAnoFilter] = useState<string>("todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -36,14 +37,28 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     resolvido: demandas.filter((d) => d.status === "Resolvido").length,
   }), [demandas]);
 
+  const anosDisponiveis = useMemo(() => {
+    const s = new Set<string>();
+    demandas.forEach((d) => {
+      const [, , y] = d.data.split("/");
+      if (y) s.add(y);
+    });
+    s.add(String(new Date().getFullYear()));
+    return Array.from(s).sort().reverse();
+  }, [demandas]);
+
   const mesesDisponiveis = useMemo(() => {
     const s = new Set<string>();
     demandas.forEach((d) => {
       const [, m, y] = d.data.split("/");
-      if (m && y) s.add(`${y}-${m}`);
+      if (!m || !y) return;
+      if (anoFilter !== "todos" && y !== anoFilter) return;
+      s.add(`${y}-${m}`);
     });
     return Array.from(s).sort().reverse();
-  }, [demandas]);
+  }, [demandas, anoFilter]);
+
+  const mesFilterEffective = mesFilter !== "todos" && anoFilter !== "todos" && !mesFilter.startsWith(`${anoFilter}-`) ? "todos" : mesFilter;
 
   const filtered = useMemo(() => {
     const qq = q.trim().toLowerCase();
@@ -51,9 +66,10 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       if (statusFilter !== "todos" && d.status !== statusFilter) return false;
       if (userFilter !== "todos" && d.user_id !== userFilter) return false;
       if (operadoraFilter !== "todos" && d.operadora !== operadoraFilter) return false;
-      if (mesFilter !== "todos") {
-        const [, m, y] = d.data.split("/");
-        if (`${y}-${m}` !== mesFilter) return false;
+      const [, m, y] = d.data.split("/");
+      if (anoFilter !== "todos" && y !== anoFilter) return false;
+      if (mesFilterEffective !== "todos") {
+        if (`${y}-${m}` !== mesFilterEffective) return false;
       }
       if (dateFrom || dateTo) {
         const [dd, mm, yy] = d.data.split("/").map(Number);
@@ -67,7 +83,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       }
       return true;
     });
-  }, [demandas, q, statusFilter, userFilter, operadoraFilter, mesFilter, dateFrom, dateTo]);
+  }, [demandas, q, statusFilter, userFilter, operadoraFilter, anoFilter, mesFilterEffective, dateFrom, dateTo]);
 
   const toggleSel = (id: string) => {
     setSelected((prev) => {
@@ -141,7 +157,11 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
             <option value="todos">Todas as operadoras</option>
             {OPERADORAS.map((o) => <option key={o} value={o}>{o}</option>)}
           </select>
-          <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer">
+          <select value={anoFilter} onChange={(e) => setAnoFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer" title="Filtrar por ano">
+            <option value="todos">Todos os anos</option>
+            {anosDisponiveis.map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+          <select value={mesFilterEffective} onChange={(e) => setMesFilter(e.target.value)} className="bg-input/80 border border-border rounded-lg px-2 py-1.5 text-xs transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)] focus:border-primary outline-none cursor-pointer">
             <option value="todos">Todos os meses</option>
             {mesesDisponiveis.map((k) => {
               const [y, m] = k.split("-");
