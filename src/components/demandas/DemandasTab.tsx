@@ -118,7 +118,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
             onClick={() => setStatusFilter("todos")}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 hover:-translate-y-0.5 ${statusFilter === "todos" ? "gradient-primary text-white shadow-[var(--glow-primary)]" : "bg-surface border border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)]"}`}
           >Todos</button>
-          {STATUS_LIST.map((s) => {
+          {STATUS_LIST.filter((s) => s !== "Sem resposta").map((s) => {
             const c = STATUS_COLORS[s];
             const active = statusFilter === s;
             return (
