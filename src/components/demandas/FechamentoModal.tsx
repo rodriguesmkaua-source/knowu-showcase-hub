@@ -35,6 +35,7 @@ const OPERATOR_LOGOS: Record<string, string> = {
   "UNIMED NOROESTE DO PARANA": unimedNoroesteParanaLogo,
   "UNIMED SANTA MARIA": unimedSantaMariaLogo,
   "UNIMED SA": unimedSaLogo,
+  "UNIMED MEDIANEIRA": unimedMedianeiraLogo,
   "CIRCULO SAUDE": circuloSaudeLogo,
 };
 function getOperatorLogo(op: string): string | null {
