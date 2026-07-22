@@ -104,7 +104,7 @@ function shortOpName(op: string): string {
   return op.replace(/^UNIMED\s+/i, "");
 }
 
-function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano: string): SlideData {
+function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano: string, anual = false): SlideData {
   const map = new Map<string, number>();
   demandas.forEach((d) => map.set(d.tipo, (map.get(d.tipo) ?? 0) + 1));
   const tipos = Array.from(map.entries())
@@ -115,7 +115,7 @@ function buildSlideData(demandas: Demanda[], operadora: string, mes: string, ano
   const countOf = (name: string) => (tipos.find((t) => t.tipo === name) || { count: 0 }).count;
   const assinatura = countOf("Reenvio de assinatura médica") + countOf("Aguardando assinatura do médico");
   const maxCount = tipos.length ? tipos[0].count : 0;
-  return { op: operadora, opDisplay: shortOpName(operadora), mes, ano, tipos, total, maior, assinatura, maxCount };
+  return { op: operadora, opDisplay: shortOpName(operadora), mes, ano, tipos, total, maior, assinatura, maxCount, anual };
 }
 
 /* ── Donut (canvas 386×386, R=193, r=92) — idêntico ao renderer original ─ */
