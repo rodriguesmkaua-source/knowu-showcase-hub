@@ -31,6 +31,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     total: demandas.length,
     aberto: demandas.filter((d) => d.status === "Aberto").length,
     andamento: demandas.filter((d) => d.status === "Em andamento").length,
+    escalado: demandas.filter((d) => d.status === "Escalado").length,
     resolvido: demandas.filter((d) => d.status === "Resolvido").length,
   }), [demandas]);
 
@@ -78,17 +79,19 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     total: "from-primary/20 to-primary/5 border-primary/30",
     aberto: "from-red-500/20 to-red-500/5 border-red-500/30",
     andamento: "from-yellow-500/20 to-yellow-500/5 border-yellow-500/30",
+    escalado: "from-orange-500/20 to-orange-500/5 border-orange-500/30",
     resolvido: "from-emerald-500/20 to-emerald-500/5 border-emerald-500/30",
   };
 
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-5 gap-3">
         {[
           ["total", "Total", stats.total],
           ["aberto", "Aberto", stats.aberto],
           ["andamento", "Em andamento", stats.andamento],
+          ["escalado", "Escalado", stats.escalado],
           ["resolvido", "Resolvido", stats.resolvido],
         ].map(([k, l, v]) => (
           <div key={String(k)} className={`glass rounded-xl p-4 bg-gradient-to-br ${statBg[k as string]}`}>
@@ -115,7 +118,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
             onClick={() => setStatusFilter("todos")}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 hover:-translate-y-0.5 ${statusFilter === "todos" ? "gradient-primary text-white shadow-[var(--glow-primary)]" : "bg-surface border border-border text-muted-foreground hover:border-primary/50 hover:text-foreground hover:shadow-[0_0_12px_-2px_oklch(0.63_0.22_285/0.4)]"}`}
           >Todos</button>
-          {STATUS_LIST.map((s) => {
+          {STATUS_LIST.filter((s) => s !== "Sem resposta").map((s) => {
             const c = STATUS_COLORS[s];
             const active = statusFilter === s;
             return (
