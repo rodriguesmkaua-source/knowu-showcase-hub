@@ -132,7 +132,11 @@ export function DashboardTab({ state }: { state: State }) {
     <div className="space-y-4">
       {/* Filtros topo */}
       <div className="filter-panel glass rounded-xl p-4 flex flex-wrap gap-3 items-center">
-        <select value={mesFilter} onChange={(e) => setMesFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
+        <select value={anoFilter} onChange={(e) => setAnoFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
+          <option value="todos">Todos os anos</option>
+          {anosDisponiveis.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <select value={mesFilterEffective} onChange={(e) => setMesFilter(e.target.value)} className="bg-input border border-border rounded-lg px-3 py-2 text-sm">
           <option value="todos">Todos os meses</option>
           {mesesDisponiveis.map((k) => {
             const [y, m] = k.split("-");
@@ -149,7 +153,7 @@ export function DashboardTab({ state }: { state: State }) {
         </select>
         <div className="flex-1" />
         <button
-          onClick={() => setFechamento({ operadora: "TODAS", mesKey: mesFilter })}
+          onClick={() => setFechamento({ operadora: "TODAS", mesKey: mesFilterEffective !== "todos" ? mesFilterEffective : (anoFilter !== "todos" ? `y-${anoFilter}` : "todos") })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium shadow-[var(--glow-primary)]"
         ><FileText className="w-4 h-4" /> Fechamento Completo</button>
       </div>
