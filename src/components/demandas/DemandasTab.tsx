@@ -37,14 +37,28 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     resolvido: demandas.filter((d) => d.status === "Resolvido").length,
   }), [demandas]);
 
+  const anosDisponiveis = useMemo(() => {
+    const s = new Set<string>();
+    demandas.forEach((d) => {
+      const [, , y] = d.data.split("/");
+      if (y) s.add(y);
+    });
+    s.add(String(new Date().getFullYear()));
+    return Array.from(s).sort().reverse();
+  }, [demandas]);
+
   const mesesDisponiveis = useMemo(() => {
     const s = new Set<string>();
     demandas.forEach((d) => {
       const [, m, y] = d.data.split("/");
-      if (m && y) s.add(`${y}-${m}`);
+      if (!m || !y) return;
+      if (anoFilter !== "todos" && y !== anoFilter) return;
+      s.add(`${y}-${m}`);
     });
     return Array.from(s).sort().reverse();
-  }, [demandas]);
+  }, [demandas, anoFilter]);
+
+  const mesFilterEffective = mesFilter !== "todos" && anoFilter !== "todos" && !mesFilter.startsWith(`${anoFilter}-`) ? "todos" : mesFilter;
 
   const filtered = useMemo(() => {
     const qq = q.trim().toLowerCase();
@@ -52,9 +66,10 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       if (statusFilter !== "todos" && d.status !== statusFilter) return false;
       if (userFilter !== "todos" && d.user_id !== userFilter) return false;
       if (operadoraFilter !== "todos" && d.operadora !== operadoraFilter) return false;
-      if (mesFilter !== "todos") {
-        const [, m, y] = d.data.split("/");
-        if (`${y}-${m}` !== mesFilter) return false;
+      const [, m, y] = d.data.split("/");
+      if (anoFilter !== "todos" && y !== anoFilter) return false;
+      if (mesFilterEffective !== "todos") {
+        if (`${y}-${m}` !== mesFilterEffective) return false;
       }
       if (dateFrom || dateTo) {
         const [dd, mm, yy] = d.data.split("/").map(Number);
@@ -68,7 +83,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       }
       return true;
     });
-  }, [demandas, q, statusFilter, userFilter, operadoraFilter, mesFilter, dateFrom, dateTo]);
+  }, [demandas, q, statusFilter, userFilter, operadoraFilter, anoFilter, mesFilterEffective, dateFrom, dateTo]);
 
   const toggleSel = (id: string) => {
     setSelected((prev) => {
