@@ -161,9 +161,11 @@ export function DashboardTab({ state }: { state: State }) {
             <div key={k.label} className="glass rounded-xl p-4">
               <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{k.label}</div>
               <div className="text-2xl font-bold mt-1">{k.value}</div>
-              <div className={`text-xs mt-1 flex items-center gap-1 ${good ? "text-emerald-400" : k.t.arr === "eq" ? "text-muted-foreground" : "text-red-400"}`}>
-                <Ico className="w-3 h-3" /> {k.t.pct}% vs mês ant.
-              </div>
+              {!isTodos && (
+                <div className={`text-xs mt-1 flex items-center gap-1 ${good ? "text-emerald-400" : k.t.arr === "eq" ? "text-muted-foreground" : "text-red-400"}`}>
+                  <Ico className="w-3 h-3" /> {k.t.pct}% vs mês ant.
+                </div>
+              )}
             </div>
           );
         })}
