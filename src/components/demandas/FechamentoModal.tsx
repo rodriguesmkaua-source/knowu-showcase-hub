@@ -193,7 +193,7 @@ function SlideCard({ data }: { data: SlideData }) {
 
   // fitTitle: reduz de 50px até caber em (1672 - 420 - 56 - 62) = 1134
   let titleSize = 50;
-  const titleText = `Fechamento ${opDisplay} ${mes}`;
+  const titleText = mes ? `Fechamento ${opDisplay} ${mes}` : `Fechamento ${opDisplay}`;
   // rough width: assume ~0.55 * fontSize per char (bold sans)
   const maxW = 1134;
   while (titleText.length * titleSize * 0.55 > maxW && titleSize > 22) titleSize -= 2;
@@ -240,7 +240,9 @@ function SlideCard({ data }: { data: SlideData }) {
         overflow: "hidden", position: "relative",
       }}>
         <div style={{ fontSize: 27, fontWeight: 800, color: C.navy, lineHeight: 1.15 }}>Relatório mensal de demandas</div>
-        <div style={{ fontSize: 17, fontWeight: 600, color: C.blue, marginTop: 4 }}>{ano ? `${mes} de ${ano}` : mes}</div>
+        {(mes || ano) && (
+          <div style={{ fontSize: 17, fontWeight: 600, color: C.blue, marginTop: 4 }}>{ano ? `${mes} de ${ano}` : mes}</div>
+        )}
 
         {/* KPIs */}
         <div style={{ display: "flex", gap: 40, margin: "26px 0 34px" }}>
@@ -332,13 +334,15 @@ function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
       <div style={{ position: "absolute", left: 99, top: 258, fontWeight: 800, lineHeight: 1.16, letterSpacing: -1.5 }}>
         <div style={{ fontSize: 104, color: C.navy }}>Fechamento</div>
         <div style={{ fontSize: 104 }}>
-          <span style={{ color: C.navy }}>Consolidado</span>{" "}
-          <span style={{ color: C.orange }}>{mes}</span>
+          <span style={{ color: C.navy }}>Consolidado</span>
+          {mes && <> <span style={{ color: C.orange }}>{mes}</span></>}
         </div>
       </div>
-      <div style={{ position: "absolute", left: 99, top: 552, fontSize: 27, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>
-        {ano ? `${mes} de ${ano}` : mes}
-      </div>
+      {(mes || ano) && (
+        <div style={{ position: "absolute", left: 99, top: 552, fontSize: 27, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>
+          {ano ? `${mes} de ${ano}` : mes}
+        </div>
+      )}
     </div>
   );
 }
@@ -351,7 +355,7 @@ export function FechamentoModal({
 
   const isTodosMeses = mesKey === "todos";
   const [ano, mes] = isTodosMeses ? ["", ""] : mesKey.split("-");
-  const mesNome = isTodosMeses ? "Todos os meses" : (MESES[parseInt(mes) - 1] || "");
+  const mesNome = isTodosMeses ? "" : (MESES[parseInt(mes) - 1] || "");
 
   const filtered = useMemo(
     () => (isTodosMeses ? demandas : demandas.filter((d) => mesDaData(d.data).key === mesKey)),
