@@ -79,17 +79,19 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     total: "from-primary/20 to-primary/5 border-primary/30",
     aberto: "from-red-500/20 to-red-500/5 border-red-500/30",
     andamento: "from-yellow-500/20 to-yellow-500/5 border-yellow-500/30",
+    escalado: "from-orange-500/20 to-orange-500/5 border-orange-500/30",
     resolvido: "from-emerald-500/20 to-emerald-500/5 border-emerald-500/30",
   };
 
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-5 gap-3">
         {[
           ["total", "Total", stats.total],
           ["aberto", "Aberto", stats.aberto],
           ["andamento", "Em andamento", stats.andamento],
+          ["escalado", "Escalado", stats.escalado],
           ["resolvido", "Resolvido", stats.resolvido],
         ].map(([k, l, v]) => (
           <div key={String(k)} className={`glass rounded-xl p-4 bg-gradient-to-br ${statBg[k as string]}`}>
