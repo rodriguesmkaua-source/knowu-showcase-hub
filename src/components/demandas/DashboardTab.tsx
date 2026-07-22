@@ -73,7 +73,7 @@ export function DashboardTab({ state }: { state: State }) {
   };
 
   const kpis = [
-    { label: "Total do mês", value: K.total, t: trend(K.total, KA.total) },
+    { label: isTodos ? "Total (todos os meses)" : "Total do mês", value: K.total, t: trend(K.total, KA.total) },
     { label: "Em aberto", value: K.abertos, t: trend(K.abertos, KA.abertos), invert: true },
     { label: "Taxa de resolução", value: `${K.taxa}%`, t: trend(K.taxa, KA.taxa) },
     { label: "Em andamento", value: K.andamento, t: trend(K.andamento, KA.andamento) },
