@@ -31,6 +31,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
     total: demandas.length,
     aberto: demandas.filter((d) => d.status === "Aberto").length,
     andamento: demandas.filter((d) => d.status === "Em andamento").length,
+    escalado: demandas.filter((d) => d.status === "Escalado").length,
     resolvido: demandas.filter((d) => d.status === "Resolvido").length,
   }), [demandas]);
 
