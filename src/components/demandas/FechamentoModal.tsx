@@ -193,7 +193,7 @@ function SlideCard({ data }: { data: SlideData }) {
 
   // fitTitle: reduz de 50px até caber em (1672 - 420 - 56 - 62) = 1134
   let titleSize = 50;
-  const titleText = `Fechamento ${opDisplay} ${mes}`;
+  const titleText = mes ? `Fechamento ${opDisplay} ${mes}` : `Fechamento ${opDisplay}`;
   // rough width: assume ~0.55 * fontSize per char (bold sans)
   const maxW = 1134;
   while (titleText.length * titleSize * 0.55 > maxW && titleSize > 22) titleSize -= 2;
