@@ -435,14 +435,26 @@ export function FechamentoModal({
 
         async function renderAndCapture(el: React.ReactElement, bg: string) {
           const host = document.createElement("div");
-          host.style.cssText = "width:1672px;height:941px;";
+          host.style.cssText = "width:1672px;height:941px;position:relative;";
           wrap.appendChild(host);
           const root = createRoot(host);
           root.render(el);
-          await new Promise((r) => setTimeout(r, 150));
-          const target = host.firstElementChild as HTMLElement;
+          // wait for React 18 async commit + layout
+          await new Promise((r) => setTimeout(r, 400));
+          const target = (host.firstElementChild as HTMLElement) || host;
           await waitForReady(target);
-          const dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.92 });
+          await new Promise((r) => setTimeout(r, 100));
+          // retry once on transient html-to-image failure
+          let dataUrl = "";
+          for (let i = 0; i < 2; i++) {
+            try {
+              dataUrl = await toJpeg(target, { ...captureOpts, backgroundColor: bg, quality: 0.9 });
+              break;
+            } catch (err) {
+              if (i === 1) throw err;
+              await new Promise((r) => setTimeout(r, 200));
+            }
+          }
           root.unmount();
           host.remove();
           return dataUrl;
@@ -468,9 +480,10 @@ export function FechamentoModal({
         pdf.save(`fechamento_${operadora}_${mesKey}.pdf`);
       }
       toast.success("PDF exportado", { id: t });
-    } catch (e) {
-      console.error(e);
-      toast.error("Falha ao gerar PDF", { id: t });
+    } catch (e: any) {
+      console.error("[FechamentoPDF] falhou:", e);
+      const msg = e?.message || String(e);
+      toast.error(`Falha ao gerar PDF: ${msg.slice(0, 140)}`, { id: t });
     }
   }
 
