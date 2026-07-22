@@ -490,7 +490,12 @@ export function FechamentoModal({
           pdf.addImage(img, "JPEG", 0, 0, 1672, 941);
         }
         wrap.remove();
-        pdf.save(isTodosMeses ? `Fechamento_Consolidado_TODOS_OS_MESES.pdf` : `Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`);
+        const fname = isTodosMeses
+          ? `Fechamento_Consolidado_TODOS_OS_MESES.pdf`
+          : isAnoOnly
+            ? `Fechamento_Consolidado_ANO_${anoOnly}.pdf`
+            : `Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`;
+        pdf.save(fname);
       } else {
         if (!slideRef.current) return;
         await waitForReady(slideRef.current);
