@@ -337,7 +337,7 @@ function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
         </div>
       </div>
       <div style={{ position: "absolute", left: 99, top: 552, fontSize: 27, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>
-        {mes} de {ano}
+        {ano ? `${mes} de ${ano}` : mes}
       </div>
     </div>
   );
