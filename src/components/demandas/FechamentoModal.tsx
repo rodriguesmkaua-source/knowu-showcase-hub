@@ -493,7 +493,7 @@ export function FechamentoModal({
           return dataUrl;
         }
 
-        const coverImg = await renderAndCapture(React.createElement(CoverSlide, { mes: mesNome, ano }), C.cover);
+        const coverImg = await renderAndCapture(React.createElement(CoverSlide, { mes: mesNome, ano, anual: isAnoOnly }), C.cover);
         pdf.addImage(coverImg, "JPEG", 0, 0, 1672, 941);
 
         for (const { op, arr } of operadorasList) {
