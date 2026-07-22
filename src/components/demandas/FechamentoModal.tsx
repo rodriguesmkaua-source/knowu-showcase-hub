@@ -405,7 +405,7 @@ export function FechamentoModal({
   const singleData = useMemo(() => {
     if (isConsolidado) return null;
     const arr = filtered.filter((d) => d.operadora === operadora);
-    return buildSlideData(arr, operadora, mesNome, ano);
+    return buildSlideData(arr, operadora, mesNome, ano, isAnoOnly);
   }, [filtered, operadora, isConsolidado, mesNome, ano]);
 
   const captureOpts = {
