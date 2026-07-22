@@ -239,7 +239,7 @@ function SlideCard({ data }: { data: SlideData }) {
         flex: 1, minHeight: 0, display: "flex", flexDirection: "column",
         overflow: "hidden", position: "relative",
       }}>
-        <div style={{ fontSize: 27, fontWeight: 800, color: C.navy, lineHeight: 1.15 }}>Relatório mensal de demandas</div>
+        <div style={{ fontSize: 27, fontWeight: 800, color: C.navy, lineHeight: 1.15 }}>{data.anual ? "Relatório anual de demandas" : "Relatório mensal de demandas"}</div>
         {(mes || ano) && (
           <div style={{ fontSize: 17, fontWeight: 600, color: C.blue, marginTop: 4 }}>{ano ? `${mes} de ${ano}` : mes}</div>
         )}
