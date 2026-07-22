@@ -334,15 +334,16 @@ function CoverSlide({ mes, ano, anual = false }: { mes: string; ano: string; anu
       <img src={capaFechamentoUrl} alt="" style={{ position: "absolute", inset: 0, width: 1672, height: 941, display: "block" }} />
       {anual && (
         <div style={{
-          position: "absolute", left: 100, top: 180,
-          width: 362, height: 45,
+          position: "absolute", left: 100, top: 176,
+          width: 362, height: 48,
           background: C.orange, color: "#fff",
-          fontSize: 24, fontWeight: 800, letterSpacing: 1,
+          fontSize: 22, fontWeight: 800, letterSpacing: 1.5,
           borderRadius: 10,
           display: "flex", alignItems: "center", justifyContent: "center",
-          whiteSpace: "nowrap",
+          lineHeight: 1, whiteSpace: "nowrap",
+          textAlign: "center", padding: 0, boxSizing: "border-box",
         }}>
-          RELATÓRIO ANUAL
+          <span style={{ display: "block", transform: "translateY(-1px)" }}>RELATÓRIO ANUAL</span>
         </div>
       )}
       <div style={{ position: "absolute", left: 99, top: 258, fontWeight: 800, lineHeight: 1.16, letterSpacing: -1.5 }}>
