@@ -35,18 +35,19 @@ export function DashboardTab({ state }: { state: State }) {
   const hojePendentes = hoje.length - hojeResolvidas;
   const hojePct = hoje.length ? Math.round((hojeResolvidas / hoje.length) * 100) : 0;
 
-  // KPIs vs mês anterior (respeita filtros)
+  // KPIs vs mês anterior (respeita filtros). Quando "todos", usa todas as demandas filtradas e não há comparação.
   const now = new Date();
   const mesAtual = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const mesRef = mesFilter !== "todos" ? mesFilter : mesAtual;
+  const isTodos = mesFilter === "todos";
+  const mesRef = isTodos ? mesAtual : mesFilter;
   const [yRef, mRef] = mesRef.split("-").map((n) => parseInt(n));
   const prevD = new Date(yRef, mRef - 2, 1);
   const mesAnt = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, "0")}`;
   const inMonth = (k: string) => demandas.filter((d) => mesDaData(d.data).key === k
     && (opFilter === "todas" || d.operadora === opFilter)
     && (tipoFilter === "todos" || d.tipo === tipoFilter));
-  const cur = inMonth(mesRef);
-  const ant = inMonth(mesAnt);
+  const cur = isTodos ? filtered : inMonth(mesRef);
+  const ant = isTodos ? [] : inMonth(mesAnt);
 
   const kpi = (curArr: Demanda[]) => {
     const total = curArr.length;
