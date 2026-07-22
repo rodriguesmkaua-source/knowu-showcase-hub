@@ -58,8 +58,8 @@ export function DashboardTab({ state }: { state: State }) {
   // KPIs vs mês anterior (respeita filtros). Quando "todos", usa todas as demandas filtradas e não há comparação.
   const now = new Date();
   const mesAtual = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const isTodos = mesFilter === "todos";
-  const mesRef = isTodos ? mesAtual : mesFilter;
+  const isTodos = mesFilterEffective === "todos";
+  const mesRef = isTodos ? mesAtual : mesFilterEffective;
   const [yRef, mRef] = mesRef.split("-").map((n) => parseInt(n));
   const prevD = new Date(yRef, mRef - 2, 1);
   const mesAnt = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, "0")}`;
