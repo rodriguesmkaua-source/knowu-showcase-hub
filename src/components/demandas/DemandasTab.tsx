@@ -67,7 +67,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
       }
       return true;
     });
-  }, [demandas, q, statusFilter, userFilter, mesFilter, dateFrom, dateTo]);
+  }, [demandas, q, statusFilter, userFilter, operadoraFilter, mesFilter, dateFrom, dateTo]);
 
   const toggleSel = (id: string) => {
     setSelected((prev) => {
