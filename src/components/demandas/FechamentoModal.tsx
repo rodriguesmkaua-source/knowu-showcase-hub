@@ -97,6 +97,7 @@ interface SlideData {
   maior: Tipo;
   assinatura: number;
   maxCount: number;
+  anual?: boolean;
 }
 
 function shortOpName(op: string): string {
