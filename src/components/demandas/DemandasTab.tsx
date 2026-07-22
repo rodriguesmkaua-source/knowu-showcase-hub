@@ -14,6 +14,7 @@ export function DemandasTab({ state, mesFilter, setMesFilter }: { state: State; 
   const [q, setQ] = useState("");
   const [statusFilter, setStatusFilter] = useState<Status | "todos">("todos");
   const [userFilter, setUserFilter] = useState<string>("todos");
+  const [operadoraFilter, setOperadoraFilter] = useState<string>("todos");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());
