@@ -384,6 +384,7 @@ export function FechamentoModal({
     pixelRatio: 2,
     backgroundColor: C.page,
     cacheBust: false,
+    skipFonts: true,
     style: { transform: "none" },
   } as const;
 
