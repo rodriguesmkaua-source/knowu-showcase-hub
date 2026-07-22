@@ -443,7 +443,7 @@ export function FechamentoModal({
           await new Promise((r) => setTimeout(r, 120));
           const target = (host.firstElementChild as HTMLElement) || host;
           await waitForReady(target);
-          await new Promise((r) => setTimeout(r, 100));
+          await new Promise((r) => setTimeout(r, 30));
           // retry once on transient html-to-image failure
           let dataUrl = "";
           for (let i = 0; i < 2; i++) {
