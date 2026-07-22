@@ -129,7 +129,7 @@ export function DashboardTab({ state }: { state: State }) {
         </select>
         <div className="flex-1" />
         <button
-          onClick={() => setFechamento({ operadora: "TODAS", mesKey: mesFilter !== "todos" ? mesFilter : mesAtual })}
+          onClick={() => setFechamento({ operadora: "TODAS", mesKey: mesFilter })}
           className="flex items-center gap-2 px-4 py-2 rounded-lg gradient-primary text-white text-sm font-medium shadow-[var(--glow-primary)]"
         ><FileText className="w-4 h-4" /> Fechamento Completo</button>
       </div>

@@ -240,7 +240,7 @@ function SlideCard({ data }: { data: SlideData }) {
         overflow: "hidden", position: "relative",
       }}>
         <div style={{ fontSize: 27, fontWeight: 800, color: C.navy, lineHeight: 1.15 }}>Relatório mensal de demandas</div>
-        <div style={{ fontSize: 17, fontWeight: 600, color: C.blue, marginTop: 4 }}>{mes} de {ano}</div>
+        <div style={{ fontSize: 17, fontWeight: 600, color: C.blue, marginTop: 4 }}>{ano ? `${mes} de ${ano}` : mes}</div>
 
         {/* KPIs */}
         <div style={{ display: "flex", gap: 40, margin: "26px 0 34px" }}>
@@ -337,7 +337,7 @@ function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
         </div>
       </div>
       <div style={{ position: "absolute", left: 99, top: 552, fontSize: 27, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>
-        {mes} de {ano}
+        {ano ? `${mes} de ${ano}` : mes}
       </div>
     </div>
   );
@@ -349,10 +349,14 @@ export function FechamentoModal({
 }: { demandas: Demanda[]; operadora: string | "TODAS"; mesKey: string; onClose: () => void }) {
   const slideRef = useRef<HTMLDivElement>(null);
 
-  const [ano, mes] = mesKey.split("-");
-  const mesNome = MESES[parseInt(mes) - 1] || "";
+  const isTodosMeses = mesKey === "todos";
+  const [ano, mes] = isTodosMeses ? ["", ""] : mesKey.split("-");
+  const mesNome = isTodosMeses ? "Todos os meses" : (MESES[parseInt(mes) - 1] || "");
 
-  const filtered = useMemo(() => demandas.filter((d) => mesDaData(d.data).key === mesKey), [demandas, mesKey]);
+  const filtered = useMemo(
+    () => (isTodosMeses ? demandas : demandas.filter((d) => mesDaData(d.data).key === mesKey)),
+    [demandas, mesKey, isTodosMeses],
+  );
 
   const isConsolidado = operadora === "TODAS";
 
@@ -471,7 +475,7 @@ export function FechamentoModal({
           pdf.addImage(img, "JPEG", 0, 0, 1672, 941);
         }
         wrap.remove();
-        pdf.save(`Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`);
+        pdf.save(isTodosMeses ? `Fechamento_Consolidado_TODOS_OS_MESES.pdf` : `Fechamento_Consolidado_${mesNome.toUpperCase()}_${ano}.pdf`);
       } else {
         if (!slideRef.current) return;
         await waitForReady(slideRef.current);
