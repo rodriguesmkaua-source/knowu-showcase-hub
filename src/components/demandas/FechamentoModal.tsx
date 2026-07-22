@@ -334,13 +334,15 @@ function CoverSlide({ mes, ano }: { mes: string; ano: string }) {
       <div style={{ position: "absolute", left: 99, top: 258, fontWeight: 800, lineHeight: 1.16, letterSpacing: -1.5 }}>
         <div style={{ fontSize: 104, color: C.navy }}>Fechamento</div>
         <div style={{ fontSize: 104 }}>
-          <span style={{ color: C.navy }}>Consolidado</span>{" "}
-          <span style={{ color: C.orange }}>{mes}</span>
+          <span style={{ color: C.navy }}>Consolidado</span>
+          {mes && <> <span style={{ color: C.orange }}>{mes}</span></>}
         </div>
       </div>
-      <div style={{ position: "absolute", left: 99, top: 552, fontSize: 27, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>
-        {ano ? `${mes} de ${ano}` : mes}
-      </div>
+      {(mes || ano) && (
+        <div style={{ position: "absolute", left: 99, top: 552, fontSize: 27, fontWeight: 800, color: C.navy, letterSpacing: -0.3 }}>
+          {ano ? `${mes} de ${ano}` : mes}
+        </div>
+      )}
     </div>
   );
 }
