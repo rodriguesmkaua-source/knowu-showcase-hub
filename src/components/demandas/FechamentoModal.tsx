@@ -440,7 +440,7 @@ export function FechamentoModal({
           const root = createRoot(host);
           root.render(el);
           // wait for React 18 async commit + layout
-          await new Promise((r) => setTimeout(r, 400));
+          await new Promise((r) => setTimeout(r, 120));
           const target = (host.firstElementChild as HTMLElement) || host;
           await waitForReady(target);
           await new Promise((r) => setTimeout(r, 100));
