@@ -35,18 +35,19 @@ export function DashboardTab({ state }: { state: State }) {
   const hojePendentes = hoje.length - hojeResolvidas;
   const hojePct = hoje.length ? Math.round((hojeResolvidas / hoje.length) * 100) : 0;
 
-  // KPIs vs mês anterior (respeita filtros)
+  // KPIs vs mês anterior (respeita filtros). Quando "todos", usa todas as demandas filtradas e não há comparação.
   const now = new Date();
   const mesAtual = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const mesRef = mesFilter !== "todos" ? mesFilter : mesAtual;
+  const isTodos = mesFilter === "todos";
+  const mesRef = isTodos ? mesAtual : mesFilter;
   const [yRef, mRef] = mesRef.split("-").map((n) => parseInt(n));
   const prevD = new Date(yRef, mRef - 2, 1);
   const mesAnt = `${prevD.getFullYear()}-${String(prevD.getMonth() + 1).padStart(2, "0")}`;
   const inMonth = (k: string) => demandas.filter((d) => mesDaData(d.data).key === k
     && (opFilter === "todas" || d.operadora === opFilter)
     && (tipoFilter === "todos" || d.tipo === tipoFilter));
-  const cur = inMonth(mesRef);
-  const ant = inMonth(mesAnt);
+  const cur = isTodos ? filtered : inMonth(mesRef);
+  const ant = isTodos ? [] : inMonth(mesAnt);
 
   const kpi = (curArr: Demanda[]) => {
     const total = curArr.length;
@@ -72,7 +73,7 @@ export function DashboardTab({ state }: { state: State }) {
   };
 
   const kpis = [
-    { label: "Total do mês", value: K.total, t: trend(K.total, KA.total) },
+    { label: isTodos ? "Total (todos os meses)" : "Total do mês", value: K.total, t: trend(K.total, KA.total) },
     { label: "Em aberto", value: K.abertos, t: trend(K.abertos, KA.abertos), invert: true },
     { label: "Taxa de resolução", value: `${K.taxa}%`, t: trend(K.taxa, KA.taxa) },
     { label: "Em andamento", value: K.andamento, t: trend(K.andamento, KA.andamento) },
@@ -160,9 +161,11 @@ export function DashboardTab({ state }: { state: State }) {
             <div key={k.label} className="glass rounded-xl p-4">
               <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">{k.label}</div>
               <div className="text-2xl font-bold mt-1">{k.value}</div>
-              <div className={`text-xs mt-1 flex items-center gap-1 ${good ? "text-emerald-400" : k.t.arr === "eq" ? "text-muted-foreground" : "text-red-400"}`}>
-                <Ico className="w-3 h-3" /> {k.t.pct}% vs mês ant.
-              </div>
+              {!isTodos && (
+                <div className={`text-xs mt-1 flex items-center gap-1 ${good ? "text-emerald-400" : k.t.arr === "eq" ? "text-muted-foreground" : "text-red-400"}`}>
+                  <Ico className="w-3 h-3" /> {k.t.pct}% vs mês ant.
+                </div>
+              )}
             </div>
           );
         })}
