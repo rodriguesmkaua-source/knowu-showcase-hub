@@ -50,7 +50,17 @@ export function AuditoriaTab() {
 
   const filtered = useMemo(() => {
     const ql = q.trim().toLowerCase();
-    return rows.filter((r) => {
+    // Dedup defensivo: mesma demanda + ação dentro de 3s são consideradas duplicadas
+    const seen = new Map<string, number>();
+    const deduped: AuditRow[] = [];
+    for (const r of rows) {
+      const bucket = Math.floor(new Date(r.created_at).getTime() / 3000);
+      const key = `${r.demanda_id ?? "-"}|${r.action}|${bucket}`;
+      if (seen.has(key)) continue;
+      seen.set(key, 1);
+      deduped.push(r);
+    }
+    return deduped.filter((r) => {
       if (action && r.action !== action) return false;
       if (!ql) return true;
       const hay = [
